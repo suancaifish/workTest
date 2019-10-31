@@ -158,7 +158,7 @@ var _default = { components: {}, data: function data() {return {};}, onShow: fun
     // log.setFilterMsg('filterkeyword')
     // log.setFilterMsg('addfilterkeyword')
   }, methods: {
-    cclickBtn: function cclickBtn() {
+    clickBtn: function clickBtn() {
       console.log('点击了按钮');
     } } };exports.default = _default;
 

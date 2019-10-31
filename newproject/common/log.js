@@ -1,32 +1,42 @@
-let log = wx.getRealtimeLogManager ? wx.getRealtimeLogManager() : null
+// let log = wx.getRealtimeLogManager ? wx.getRealtimeLogManager() : null
 
+const logger = wx.getRealtimeLogManager()
+logger.info({str: 'hello world'}, 'info log', 100, [1, 2, 3])
+logger.error({str: 'hello world'}, 'error log', 100, [1, 2, 3])
+logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
 export default {
-    debug() {
-       if (!log) return
-       log.debug.apply(log, arguments)
-     },
+    // debug() {
+    //    if (!log) return
+    //    log.debug.apply(log, arguments)
+    //  },
      info() {
-       if (!log) return
-       log.info.apply(log, arguments)
+      //  if (!log) return
+      logger.info({str: 'hello world'}, 'info log', 100, [1, 2, 3])
+      //  log.info({str: 'info'}, 'info log', 100, [1, 2, 3])
      },
      warn() {
-       if (!log) return
-       log.warn.apply(log, arguments)
+      //  if (!log) return
+	 
+      //  log.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
+       
+      logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
      },
      error() {
-       if (!log) return
-       log.error.apply(log, arguments)
+      //  if (!log) return
+      //  log.error({str: 'error'}, 'error log', 100, [1, 2, 3])
+logger.error({str: 'hello world'}, 'error log', 100, [1, 2, 3])
+       
      },
-     setFilterMsg(msg) { // 从基础库2.7.3开始支持
-       if (!log || !log.setFilterMsg) return
-       if (typeof msg !== 'string') return
-       log.setFilterMsg(msg)
-     },
-     addFilterMsg(msg) { // 从基础库2.8.1开始支持
-       if (!log || !log.addFilterMsg) return
-       if (typeof msg !== 'string') return
-       log.addFilterMsg(msg)
-     }
+    //  setFilterMsg(msg) { // 从基础库2.7.3开始支持
+    //    if (!log || !log.setFilterMsg) return
+    //    if (typeof msg !== 'string') return
+    //    log.setFilterMsg(msg)
+    //  },
+    //  addFilterMsg(msg) { // 从基础库2.8.1开始支持
+    //    if (!log || !log.addFilterMsg) return
+    //    if (typeof msg !== 'string') return
+    //    log.addFilterMsg(msg)
+    //  }
 }
 
 // 使用 在页面引入log.js文件 在

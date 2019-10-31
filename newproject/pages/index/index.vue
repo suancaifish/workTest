@@ -24,7 +24,7 @@ export default {
     // log.setFilterMsg('addfilterkeyword')
   },
   methods: {
-	  cclickBtn(){
+	  clickBtn(){
 		  console.log('点击了按钮');
 	  }
   }

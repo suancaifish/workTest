@@ -20,11 +20,11 @@ import log from '../../common/log.js'
 			}
 		},onShow() {
 			// console.log(3)
-			// log.info('mine') // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-			// log.warn('mine')
-			// log.error('mine')
-			// log.setFilterMsg('filterkeyword')
-			// log.setFilterMsg('addfilterkeyword')
+			log.info('mine') // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
+			log.warn('mine')
+			log.error('mine')
+			log.setFilterMsg('filterkeyword')
+			log.setFilterMsg('addfilterkeyword')
 		},
 		methods: {
 focus(){

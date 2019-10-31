@@ -95,20 +95,21 @@ Object.defineProperty(exports, "__esModule", { value: true });exports.default = 
 var _log = _interopRequireDefault(__webpack_require__(/*! ./common/log.js */ 12));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var _default =
 {
   onLaunch: function onLaunch() {
-    console.log('App Launch');
+    console.log("App Launch");
   },
   onShow: function onShow() {
-    console.log('App Show');
-    _log.default.info('user info'); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-
-    _log.default.error('error');
+    console.log("App Show");
+    _log.default.info("user info1"); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
+    _log.default.warn("sss1");
+    _log.default.error("error1");
     // log.setFilterMsg('filterkeyword')
     // log.setFilterMsg('addfilterkeyword')
   },
   onHide: function onHide() {
-    console.log('App Hide');
-    _log.default.info('user info'); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-    _log.default.error('error');
+    console.log("App Hide");
+    _log.default.info("user info2"); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
+    _log.default.error("error2");
+    _log.default.warn("sss2");
   } };exports.default = _default;
 
 /***/ }),

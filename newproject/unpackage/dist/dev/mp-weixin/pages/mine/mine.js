@@ -144,11 +144,11 @@ var _log = _interopRequireDefault(__webpack_require__(/*! ../../common/log.js */
 //
 //
 var _default = { components: {}, data: function data() {return { isok: true };}, onShow: function onShow() {// console.log(3)
-    // log.info('mine') // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-    // log.warn('mine')
-    // log.error('mine')
-    // log.setFilterMsg('filterkeyword')
-    // log.setFilterMsg('addfilterkeyword')
+    _log.default.info('mine'); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
+    _log.default.warn('mine');
+    _log.default.error('mine');
+    _log.default.setFilterMsg('filterkeyword');
+    _log.default.setFilterMsg('addfilterkeyword');
   },
   methods: {
     focus: function focus() {
