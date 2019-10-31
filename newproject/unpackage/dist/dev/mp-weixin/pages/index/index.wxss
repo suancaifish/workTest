@@ -1,0 +1,9 @@
+
+uni-page-body {
+	background-color: #f4f4f4;
+}
+.p10 {
+	padding: 10px;
+	font-size: 16px;
+}
+
