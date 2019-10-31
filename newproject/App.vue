@@ -17,6 +17,7 @@ export default {
     log.info("user info"); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
     log.error("error");
     log.warn("sss");
+    console.log('ps');
   }
 };
 </script>
