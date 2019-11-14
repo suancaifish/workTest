@@ -1,0 +1,86 @@
+$bg:#2d3a4b;
+$dark_gray:#889aa4;
+$font-color:#676a6c;
+
+.login-container {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background: url('../../assets/image/login-bg.png');
+  background-size: 100% 100%;
+
+  .login-form {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 520px;
+    max-width: 100%;
+    padding: 35px 35px 15px 35px;
+    margin: 120px auto;
+    background: #FFF;
+    animation: logIn 1s;
+    border-radius: 10px;
+  }
+
+  @keyframes logIn {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .denglu-logo {
+    text-align: center;
+  }
+
+  .svg-container {
+    padding: 6px 5px 6px 15px;
+    color: $dark_gray;
+    vertical-align: middle;
+    width: 30px;
+    display: inline-block;
+  }
+
+  .svg-container-right {
+    @extend .svg-container;
+    padding: 6px 15px 6px 5px;
+  }
+
+  .title-container {
+    position: relative;
+
+    .title {
+      font-size: 22px;
+      margin: 10px auto 28px auto;
+      text-align: center;
+      font-weight: bold;
+      color: $font-color;
+    }
+
+  }
+
+  .login-input-bg {
+    background: $bg;
+    margin-bottom: 20px;
+  }
+
+  .login-btn {
+    padding: 0;
+    line-height: 45px;
+    width: 150px;
+    background: $bg;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 16px;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+}

@@ -1,0 +1,100 @@
+@import '~antd/es/style/themes/default.less';
+
+.item {
+  flex   : auto;
+  display: flex;
+}
+
+.listWrap {
+  .listHeader {
+    margin : 10px 0;
+    padding: 10px 20px;
+    border : 1px solid @border-color-split;
+    .item;
+    flex-direction: row;
+
+    div {
+      width     : 100px;
+      flex      : auto;
+      text-align: center;
+
+    }
+
+    .shop {
+      width: 200px;
+      flex : auto;
+    }
+  }
+
+  .listItem {
+
+    .goods {
+      .item;
+      flex-direction: column;
+      border-right  : 1px solid @border-color-split;
+      padding       : @padding-md;
+
+      .goodsWraps {
+        width: 100%;
+        .item;
+        flex-direction : row;
+        justify-content: flex-start;
+        align-items    : flex-start;
+
+        .goodsItem {
+          flex      : auto;
+          text-align: center;
+          width     : 100px;
+        }
+      }
+
+      .goodsWraps:last-child {
+        :global(.ant-list-item-meta) {
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .context {
+      .item;
+      flex-direction: row;
+      padding       : @padding-md;
+
+      .contextItem {
+        flex         : auto;
+        width        : 100px;
+        text-align   : center;
+        overflow     : hidden;
+        white-space  : nowrap;
+        text-overflow: ellipsis;
+        word-break   : break-all;
+      }
+    }
+  }
+
+  :global {
+    .ant-list-item {
+      justify-content           : space-between;
+      align-items               : flex-start;
+      border                    : 1px solid @border-color-split;
+      margin-bottom             : 10px;
+      border-bottom-right-radius: @border-radius-base;
+      border-bottom-left-radius : @border-radius-base;
+      padding                   : 0;
+
+      .ant-list-item-meta {
+        width        : 200px;
+        flex         : auto;
+        margin-bottom: 10px;
+
+        .ant-list-item-meta-content {
+          text-align: left;
+        }
+      }
+    }
+
+    .ant-list-item:last-child {
+      border-bottom: 1px solid @border-color-split;
+    }
+  }
+}

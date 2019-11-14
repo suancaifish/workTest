@@ -1,0 +1,20 @@
+@import '../../../../styles/variables';
+.freight-detail {
+    .freight-detail-header {
+        .freight-detail-header-title{
+            p {
+                color: $tableHeaderColor;
+                margin-right: 20px;
+            }
+        } 
+    }
+    
+    .update-btn {
+        margin-left: 20px;
+    }
+
+    .freight-detail-footer {
+        margin-top: 10px;
+    }
+    
+}

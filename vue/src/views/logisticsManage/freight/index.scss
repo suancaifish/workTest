@@ -1,0 +1,32 @@
+@import '../../../styles/variables';
+
+.freight {
+    .freight-header {
+        .freight-header-title {
+            >p {
+                font-weight: bold;
+                color: $tableHeaderColor;
+                margin-bottom: 20px;
+                a {
+                    color: $tiffany;
+                    font-size: 14px;
+                    display: inline-block;
+                    margin-left: 5px;
+                }
+            }
+            
+            .info-icon {
+                display: inline-block;
+                margin-left: 5px;
+            }
+        }
+    }
+
+    .freight-body {
+        .freight-body-title {
+            font-weight: bold;
+            color: $tableHeaderColor;
+            margin-bottom: 10px;
+        }
+    }
+}

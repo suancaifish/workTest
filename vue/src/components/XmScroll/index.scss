@@ -1,0 +1,52 @@
+.xm-scroll {
+    >.el-scrollbar {
+        height: 100%;
+		width: 100%;
+        >.el-select-dropdown__wrap {
+			max-height: 100%;
+            margin-bottom: 0 !important;
+            >.el-select-dropdown__list {
+                padding: 0;
+            }
+        }
+        >.el-scrollbar__wrap {
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+        .is-horizontal{
+            display: none;
+        }
+        .el-scrollbar__thumb {
+            // display: none;
+        }
+    }
+}
+.back-to-ceiling {
+    position: fixed;
+    display: inline-block;
+    text-align: center;
+    cursor: pointer;
+    z-index: 9999;
+    opacity: 0.8;
+    &:hover{
+        background: #343439 !important;
+        .Icon{
+            fill: #ffd04b;
+        }
+    }
+  }
+
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity .5s;
+  }
+
+  .fade-enter,
+  .fade-leave-to {
+    opacity: 0
+  }
+
+  .back-to-ceiling .Icon {
+    fill: #9aaabf;
+    background: none;
+  }

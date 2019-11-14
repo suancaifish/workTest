@@ -1,0 +1,26 @@
+.multiCascader{
+  position: relative;
+  .tag{
+    max-width: calc(100% - 30px);
+    position: absolute;
+    left: 10px;
+    top: 7px;
+    .el-tag--small{
+      max-width: 50px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      position: absolute;
+      left: -47px;
+      padding: 0 4px;
+    }
+    >.el-tag--small:nth-child(1){
+      max-width: 95%;
+      position: relative;
+      left: 0px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

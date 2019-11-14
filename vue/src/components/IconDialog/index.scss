@@ -1,0 +1,32 @@
+
+@import '../../styles/variables';
+.icon-list {
+  flex-wrap: wrap;
+  .icon {
+    width: 60px;
+    transition: 0.3s;
+		margin-right: 20px;
+		margin-bottom: 20px;
+    color: $normalBg;
+    border-radius: 10px;
+		cursor: pointer;
+		text-align: center;
+    div {
+      text-align: center;
+      i {
+        font-size: 20px;
+      }
+		}
+		p{
+			margin-top: 5px;
+			font-size: 12px;
+		}
+    &:hover {
+      color: $normalColor;
+      transform: scale(1.2);
+    }
+  }
+  .active {
+		color: $normalColor;
+	}
+}

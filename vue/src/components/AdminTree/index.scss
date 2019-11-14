@@ -1,0 +1,15 @@
+@import '../../styles/variables';
+.tree-node{
+    width: 100%;
+    padding-right: 20px;
+    .tree-node-label{
+        margin: 0 10px;
+    }
+    .tree-node-num{
+        font-weight: bold;
+        span{
+            color: $normalColor;
+        }
+        
+    }
+}

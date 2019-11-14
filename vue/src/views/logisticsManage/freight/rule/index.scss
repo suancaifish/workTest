@@ -1,0 +1,26 @@
+.freight-rule {
+    background: #FFF;
+    color: #000;
+
+    .freight-rule-wrap {
+        margin-bottom: 40px;
+
+        .freight-rule-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .freight-rule-txt {
+            margin-bottom: 10px;
+        }
+        
+        .freight-rule-detail {
+            align-items: flex-start;
+            >p:nth-child(1) {
+                min-width: 50px;
+            }
+        }
+    }
+    
+}

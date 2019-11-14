@@ -1,0 +1,340 @@
+@import '../../../styles/variables';
+$color: #606266;
+
+.commodity-edit {
+    position: relative;
+    .title {
+        color: $menuBg;
+        font-size: 14px;
+        padding: 10px;
+        font-weight: bold;
+        border: 1px solid $formThColor;
+        background: #ecf3fc;
+        border-radius: 4px;
+        margin-bottom: 15px;
+    }
+
+    .border-line {
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        background: $formThColor;
+        left: 0;
+        top: 40px;
+    }
+
+    .base-width {
+        width: 500px;
+    }
+
+    .base {
+        margin-bottom: 10px;
+        padding: 10px;
+        background: #FFF;
+        border-radius: 4px;
+        box-shadow: 2px 2px 10px 1px rgba(0, 0, 0, 0.1);
+    }
+
+    .base-close {
+        position: absolute;
+        cursor: pointer;
+        right: -10px;
+        top: -15px;
+        font-size: 20px;
+        transition: 0.3s;
+        opacity: 1;
+        display: none;
+        animation: fadeIn 0.5s;
+        &:hover {
+            opacity: 0.7;
+        }
+    }
+
+    .base-info {
+        @extend .base;
+        .base-info-form {
+            padding-left: 11px;
+            
+            .base-info-category-create, .base-info-attribute-create {
+                cursor: pointer;
+                text-decoration: underline;
+                color: $tiffany;
+                &:hover {
+                    color: $light-blue;
+                }
+            }
+
+            .base-info-category {
+                position: relative;
+                .base-info-category-create {
+                    position: absolute;
+                    right: -90px;
+                    top: 6px;
+                }
+            }
+            
+
+            .base-info-attribute {
+                box-sizing: border-box;
+                border: 1px solid $formThColor;
+                padding: 10px;
+                ul {
+                    li {
+                        color: $color;
+                        margin-bottom: 10px;
+                        background: #ecf3fc;
+                        border: 1px solid $formThColor;
+                        padding: 10px;
+                        position: relative;
+                        &:hover{
+                            >.close-icon {
+                                display: block;
+                            }
+                        }
+                        >div:nth-child(1) {
+                            margin-bottom: 10px;
+                        }
+                        >.close-icon {
+                            @extend .base-close;
+                        }
+                        
+                        .base-info-attribute-value-wrap {
+                            flex-wrap: wrap;
+                        }
+    
+                        .base-info-attribute-label {
+                            flex: 0 0 70px;
+                            width: 70px;
+                            text-align: left;
+                            font-weight: bold;
+                        }
+                        .base-info-attribute-value {
+                            flex-wrap: wrap;
+                            max-width: calc(100% - 70px);
+                            .base-info-attribute-content {
+                                position: relative;
+                                margin-bottom: 5px;
+                                margin-right: 20px;
+                                .close-icon {
+                                    @extend .base-close;
+                                    font-size: 16px;
+                                    right: -7px;
+                                    top: -14px;
+                                }
+                                &:hover {
+                                    .close-icon {
+                                        display: block;
+                                    }
+                                }
+                            }
+                            
+                        }
+                        .base-info-attribute-input {
+                            width: 300px;
+                        }
+    
+                        .base-info-attribute-add {
+                            cursor: pointer;
+                            text-decoration: underline;
+                            color: $tiffany;
+                            &:hover {
+                                color: $light-blue;
+                            }
+                        }
+
+                        .base-info-attribute-create {
+                            margin-left: 20px;
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+
+    .price-inventory {
+        @extend .base;
+        .price-inventory-form {
+            padding-left: 11px;
+        }
+        .price-detail {
+            box-sizing: border-box;
+            border: 1px solid $formThColor;
+            padding: 0 10px 20px;
+            position: relative;
+        }
+        .price-size {
+            box-sizing: border-box;
+            border: 1px solid $formThColor;
+            padding: 10px;
+            ul {
+                li {
+                    color: $color;
+                    margin-bottom: 10px;
+                    background: #ecf3fc;
+                    border: 1px solid $formThColor;
+                    padding: 10px;
+                    position: relative;
+                    &:hover{
+                        >.close-icon {
+                            display: block;
+                        }
+                    }
+                    >div:nth-child(1) {
+                        margin-bottom: 10px;
+                    }
+                    >.close-icon {
+                        @extend .base-close;
+                    }
+                    
+                    .price-size-value-wrap {
+                        flex-wrap: wrap;
+                    }
+
+                    .price-size-label {
+                        flex: 0 0 70px;
+                        width: 70px;
+                        text-align: left;
+                        font-weight: bold;
+                    }
+                    .price-size-value {
+                        flex-wrap: wrap;
+                        max-width: calc(100% - 70px);
+                        .price-size-content {
+                            position: relative;
+                            margin-bottom: 5px;
+                            margin-right: 20px;
+                            .close-icon {
+                                @extend .base-close;
+                                font-size: 16px;
+                                right: -7px;
+                                top: -14px;
+                            }
+                            &:hover {
+                                .close-icon {
+                                    display: block;
+                                }
+                            }
+                        }
+                        
+                    }
+                    .price-size-input {
+                        width: 150px;
+                    }
+
+                    .price-size-add {
+                        cursor: pointer;
+                        text-decoration: underline;
+                        color: $tiffany;
+                        &:hover {
+                            color: $light-blue;
+                        }
+                    }
+                }
+            }
+        }
+
+        .price-size-detail {
+            
+        }
+    }
+
+    .commodity-description {
+        @extend .base;
+        .description-info-form {
+            padding-left: 11px;
+            position: relative;
+           
+        }
+    }
+
+    .other-info {
+        @extend .base;
+        .other-info-form {
+            padding-left: 11px;
+
+            .other-select {
+                width: 250px;
+                margin-right: 20px;
+            }
+        }
+    }
+
+    .footer {
+        @extend .base;
+    }
+
+}
+
+.ql-editor-main {
+    max-width: 50% !important;
+    position: relative;
+    &::before {
+        content: '*';
+        position: absolute;
+        left: -10px;
+        top: 0;
+        color: #f56c6c;
+    }
+}
+
+.ql-editor {
+    color: #000;
+    background: #FFF;
+    position: relative;
+}
+
+.ql-editor-cp {
+    width: 50%;
+    flex: 1;
+    margin-left: 10px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+}
+
+.max-text {
+    box-sizing: border-box;
+    color: #606266;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.btn-fixed {
+    position: fixed;
+    bottom: 0;
+}
+
+.tip-wrap {
+    position: relative;
+
+    .combinationAmount-tip {
+        position: absolute;
+        top: -58px;
+        right: 50%;
+        transform: translateX(42px);
+        color: #606266;
+        &:hover {
+            color: #3d3e41;
+        }
+    }
+
+    .combinationAmount-x {
+        position: absolute;
+        right: -15px;
+        top: 0;
+        font-size: 18px;
+        color: #606266
+    }
+
+    .minBuyAmount-tip {
+        position: absolute;
+        top: -58px;
+        right: 50%;
+        transform: translateX(37px);
+        color: #606266;
+        &:hover {
+            color: #3d3e41;
+        }
+    }
+}

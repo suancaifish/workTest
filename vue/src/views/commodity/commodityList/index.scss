@@ -1,0 +1,50 @@
+@import '../../../styles/variables';
+
+.commodity-list {
+    .table-img {
+		cursor: pointer;
+        img {
+            width: 120px;
+            height: 120px;
+        }
+    }
+
+	.good-list {
+		margin-bottom: 10px;
+	}
+
+	.setting-shop-btn {
+		margin-left: 20px;
+		width: 70px;
+		flex: 0 0 70px;
+		div {
+			cursor: pointer;
+			text-align: center;
+			width: 30px;
+			height: 30px;
+			line-height: 30px;
+			i {
+				font-size: 16px;
+			}
+		}
+
+		.setting-shop-add {
+			background: $primaryColor;
+			color: #FFF;
+			border-radius: 5px;
+			&:hover{
+				background: $primaryHover;
+			}
+		}
+
+		.setting-shop-delete {
+			color: #FFF;
+			background: $dangerColor;
+			border-radius: 5px;
+			margin-left: 10px;
+			&:hover{
+				background: $dangerHover;
+			}
+		}
+	}
+}
