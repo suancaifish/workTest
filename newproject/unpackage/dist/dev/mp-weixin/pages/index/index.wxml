@@ -1,1 +1,1 @@
-<view><view>11111<button data-event-opts="{{[['tap',[['clickBtn',['$event']]]]]}}" bindtap="__e">提交</button></view></view>
+<view><view>index</view><view>{{"hello,"+name2}}</view><button data-event-opts="{{[['tap',[['doIt',['$event']]]]]}}" bindtap="__e">doIt</button></view>

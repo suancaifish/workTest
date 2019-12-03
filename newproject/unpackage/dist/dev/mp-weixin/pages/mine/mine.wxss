@@ -1,21 +1,20 @@
 
 .aa {
-	height: 400rpx;
-	overflow: auto;
+    height: 400rpx;
+    overflow: auto;
 }
 .dd {
-	height: 100rpx;
+    height: 100rpx;
 }
-.cjw{
-	height: 300rpx;
-	width: 400rpx;
-	background:pink;
+.cjw {
+    height: 300rpx;
+    width: 400rpx;
+    background: pink;
 }
-.input-placeholder{
-	
-	position: relative;
-	top: 0;
-	left: 0;
-	color:#007AFF;
+.input-placeholder {
+    position: relative;
+    top: 0;
+    left: 0;
+    color: #007aff;
 }
 

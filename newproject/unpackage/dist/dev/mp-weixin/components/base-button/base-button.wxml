@@ -1,0 +1,1 @@
+<button class="{{[' f24 br2000 tc h44 lh44 data-v-1e43428b',backgroundColor=='gray'||disabled==true?'gray-status-btn':'orange-status-btn']}}" data-text="{{text}}" type="primary" disabled="{{disabled}}" data-event-opts="{{[['tap',[['clickBtn',['$event']]]]]}}" bindtap="__e">{{text}}</button>

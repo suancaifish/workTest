@@ -1,0 +1,32 @@
+.shadow {
+  box-shadow: 0 0 5px #eee;;
+}
+/*登录、注册、找回密码通用样式开始*/
+.input-placeholder {
+  color: #999;
+}
+.get-code text.txt-2 {
+  color: #3e89f8;
+}
+.form-btn {
+  padding: 94upx 50upx 42upx;
+  button {
+    height: 88upx;
+    background: #65a6fe;
+    color: #fff;
+    &[disabled][type=default] {
+      background: #b5b5b5;
+      color: #fff;
+    }
+  }
+}
+.red,
+.error-tip {
+  color: #f75234;
+}
+/*登录、注册、重置通用样式结束*/
+/* #ifdef H5 */
+uni-page-head {
+  display: none;
+}
+/* #endif */

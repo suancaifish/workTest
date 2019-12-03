@@ -255,7 +255,7 @@ function isSyncApi(name) {
 }
 
 function isCallbackApi(name) {
-  return CALLBACK_API_RE.test(name);
+  return CALLBACK_API_RE.test(name) && name !== 'onPush';
 }
 
 function handlePromise(promise) {
@@ -484,6 +484,7 @@ function wrapper(methodName, method) {
 var todoApis = Object.create(null);
 
 var TODOS = [
+'onTabBarMidButtonTap',
 'subscribePush',
 'unsubscribePush',
 'onPush',
@@ -733,7 +734,7 @@ function initData(vueOptions, context) {
     try {
       data = data.call(context); // 支持 Vue.prototype 上挂的数据
     } catch (e) {
-      if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.warn('根据 Vue 的 data 函数初始化小程序 data 失败，请尽量确保 data 函数中不访问 vm 对象，否则可能影响首次数据渲染速度。', data);
       }
     }
@@ -1176,6 +1177,8 @@ function parseBaseApp(vm, _ref3)
 
 
       this.$vm.$scope = this;
+      // vm 上也挂载 globalData
+      this.$vm.globalData = this.globalData;
 
       this.$vm._isMounted = true;
       this.$vm.__call_hook('mounted', args);
@@ -1282,11 +1285,20 @@ function parseBaseComponent(vueComponentOptions)
 {var _ref5 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},isPage = _ref5.isPage,initRelation = _ref5.initRelation;var _initVueComponent =
   initVueComponent(_vue.default, vueComponentOptions),_initVueComponent2 = _slicedToArray(_initVueComponent, 2),VueComponent = _initVueComponent2[0],vueOptions = _initVueComponent2[1];
 
-  var componentOptions = {
-    options: {
-      multipleSlots: true,
-      addGlobalClass: true },
+  var options = {
+    multipleSlots: true,
+    addGlobalClass: true };
 
+
+  {
+    // 微信multipleSlots  部分情况有 bug，导致内容顺序错乱 如 u-list，提供覆盖选项
+    if (vueOptions['mp-weixin'] && vueOptions['mp-weixin']['options']) {
+      Object.assign(options, vueOptions['mp-weixin']['options']);
+    }
+  }
+
+  var componentOptions = {
+    options: options,
     data: initData(vueOptions, _vue.default.prototype),
     behaviors: initBehaviors(vueOptions, initBehavior),
     properties: initProperties(vueOptions.props, false, vueOptions.__file),
@@ -6978,7 +6990,7 @@ function type(obj) {
 
 function flushCallbacks$1(vm) {
     if (vm.__next_tick_callbacks && vm.__next_tick_callbacks.length) {
-        if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+        if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:flushCallbacks[' + vm.__next_tick_callbacks.length + ']');
@@ -6999,14 +7011,14 @@ function nextTick$1(vm, cb) {
     //1.nextTick 之前 已 setData 且 setData 还未回调完成
     //2.nextTick 之前存在 render watcher
     if (!vm.__next_tick_pending && !hasRenderWatcher(vm)) {
-        if(Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + vm._uid +
                 ']:nextVueTick');
         }
         return nextTick(cb, vm)
     }else{
-        if(Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG){
+        if(Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG){
             var mpInstance$1 = vm.$scope;
             console.log('[' + (+new Date) + '][' + (mpInstance$1.is || mpInstance$1.route) + '][' + vm._uid +
                 ']:nextMPTick');
@@ -7082,7 +7094,7 @@ var patch = function(oldVnode, vnode) {
     });
     var diffData = diff(data, mpData);
     if (Object.keys(diffData).length) {
-      if (Object({"NODE_ENV":"development","VUE_APP_PLATFORM":"mp-weixin","BASE_URL":"/"}).VUE_APP_DEBUG) {
+      if (Object({"VUE_APP_PLATFORM":"mp-weixin","NODE_ENV":"development","BASE_URL":"/"}).VUE_APP_DEBUG) {
         console.log('[' + (+new Date) + '][' + (mpInstance.is || mpInstance.route) + '][' + this._uid +
           ']差量更新',
           JSON.stringify(diffData));
@@ -7489,9 +7501,9 @@ module.exports = g;
 
 /***/ }),
 /* 4 */
-/*!************************************************!*\
-  !*** D:/Mywork/workTest/newproject/pages.json ***!
-  \************************************************/
+/*!****************************************!*\
+  !*** E:/newfile/newproject/pages.json ***!
+  \****************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -7593,7 +7605,10 @@ var getPlatformName = function getPlatformName() {
 var getPackName = function getPackName() {
   var packName = '';
   if (getPlatformName() === 'wx' || getPlatformName() === 'qq') {
-    packName = uni.getAccountInfoSync().miniProgram.appId || '';
+    // 兼容微信小程序低版本基础库
+    if (uni.canIUse('getAccountInfoSync')) {
+      packName = uni.getAccountInfoSync().miniProgram.appId || '';
+    }
   }
   return packName;
 };
@@ -8205,7 +8220,7 @@ Stat = /*#__PURE__*/function (_Util) {_inherits(Stat, _Util);_createClass(Stat, 
     _this6 = _possibleConstructorReturn(this, _getPrototypeOf(Stat).call(this));
     _this6.instance = null;
     // 注册拦截器
-    if (typeof uni.addInterceptor === 'function') {
+    if (typeof uni.addInterceptor === 'function' && "development" !== 'development') {
       _this6.addInterceptorInit();
       _this6.interceptLogin();
       _this6.interceptShare(true);
@@ -8389,71 +8404,67 @@ main();
 /*! exports provided: _from, _id, _inBundle, _integrity, _location, _phantomChildren, _requested, _requiredBy, _resolved, _shasum, _spec, _where, author, bugs, bundleDependencies, deprecated, description, devDependencies, files, gitHead, homepage, license, main, name, repository, scripts, version, default */
 /***/ (function(module) {
 
-module.exports = {"_from":"@dcloudio/uni-stat@next","_id":"@dcloudio/uni-stat@2.0.0-23320190923002","_inBundle":false,"_integrity":"sha512-MnftsvgOac3q1FCOBPzivbFn8GNQFo7D2DY325HeEZyFCWgx5GEwHpGYjT1PQU6v7DaDn0ruxa3ObdpUIYbmZw==","_location":"/@dcloudio/uni-stat","_phantomChildren":{},"_requested":{"type":"tag","registry":true,"raw":"@dcloudio/uni-stat@next","name":"@dcloudio/uni-stat","escapedName":"@dcloudio%2funi-stat","scope":"@dcloudio","rawSpec":"next","saveSpec":null,"fetchSpec":"next"},"_requiredBy":["#USER","/","/@dcloudio/vue-cli-plugin-uni"],"_resolved":"https://registry.npmjs.org/@dcloudio/uni-stat/-/uni-stat-2.0.0-23320190923002.tgz","_shasum":"0c400c140ca0b3c05f52d25f11583cf05a0c4e9a","_spec":"@dcloudio/uni-stat@next","_where":"/Users/fxy/Documents/DCloud/HbuilderX-plugins/release/uniapp-cli","author":"","bugs":{"url":"https://github.com/dcloudio/uni-app/issues"},"bundleDependencies":false,"deprecated":false,"description":"","devDependencies":{"@babel/core":"^7.5.5","@babel/preset-env":"^7.5.5","eslint":"^6.1.0","rollup":"^1.19.3","rollup-plugin-babel":"^4.3.3","rollup-plugin-clear":"^2.0.7","rollup-plugin-commonjs":"^10.0.2","rollup-plugin-copy":"^3.1.0","rollup-plugin-eslint":"^7.0.0","rollup-plugin-json":"^4.0.0","rollup-plugin-node-resolve":"^5.2.0","rollup-plugin-replace":"^2.2.0","rollup-plugin-uglify":"^6.0.2"},"files":["dist","package.json","LICENSE"],"gitHead":"fed4c73fb9142a1b277dd79313939cad90693d3e","homepage":"https://github.com/dcloudio/uni-app#readme","license":"Apache-2.0","main":"dist/index.js","name":"@dcloudio/uni-stat","repository":{"type":"git","url":"git+https://github.com/dcloudio/uni-app.git","directory":"packages/uni-stat"},"scripts":{"build":"NODE_ENV=production rollup -c rollup.config.js","dev":"NODE_ENV=development rollup -w -c rollup.config.js"},"version":"2.0.0-23320190923002"};
+module.exports = {"_from":"@dcloudio/uni-stat@next","_id":"@dcloudio/uni-stat@2.0.0-24220191115004","_inBundle":false,"_integrity":"sha512-UKnpiHSP7h9c5IFpJFkWkpm1KyWz9iHj1hchrQSUxPhChx+KPOmunnQcKGiQvvBz9CeSi7Se/eauJYha5ch0kw==","_location":"/@dcloudio/uni-stat","_phantomChildren":{},"_requested":{"type":"tag","registry":true,"raw":"@dcloudio/uni-stat@next","name":"@dcloudio/uni-stat","escapedName":"@dcloudio%2funi-stat","scope":"@dcloudio","rawSpec":"next","saveSpec":null,"fetchSpec":"next"},"_requiredBy":["#USER","/","/@dcloudio/vue-cli-plugin-uni"],"_resolved":"https://registry.npmjs.org/@dcloudio/uni-stat/-/uni-stat-2.0.0-24220191115004.tgz","_shasum":"5848f2204f37daaf8c340fb27d9f76b16fcbfdeb","_spec":"@dcloudio/uni-stat@next","_where":"/Users/guoshengqiang/Documents/dcloud-plugins/release/uniapp-cli","author":"","bugs":{"url":"https://github.com/dcloudio/uni-app/issues"},"bundleDependencies":false,"deprecated":false,"description":"","devDependencies":{"@babel/core":"^7.5.5","@babel/preset-env":"^7.5.5","eslint":"^6.1.0","rollup":"^1.19.3","rollup-plugin-babel":"^4.3.3","rollup-plugin-clear":"^2.0.7","rollup-plugin-commonjs":"^10.0.2","rollup-plugin-copy":"^3.1.0","rollup-plugin-eslint":"^7.0.0","rollup-plugin-json":"^4.0.0","rollup-plugin-node-resolve":"^5.2.0","rollup-plugin-replace":"^2.2.0","rollup-plugin-uglify":"^6.0.2"},"files":["dist","package.json","LICENSE"],"gitHead":"bcf65737c5111d47398695d3db8ed87305df346e","homepage":"https://github.com/dcloudio/uni-app#readme","license":"Apache-2.0","main":"dist/index.js","name":"@dcloudio/uni-stat","repository":{"type":"git","url":"git+https://github.com/dcloudio/uni-app.git","directory":"packages/uni-stat"},"scripts":{"build":"NODE_ENV=production rollup -c rollup.config.js","dev":"NODE_ENV=development rollup -w -c rollup.config.js"},"version":"2.0.0-24220191115004"};
 
 /***/ }),
 /* 7 */
-/*!*****************************************************************!*\
-  !*** D:/Mywork/workTest/newproject/pages.json?{"type":"style"} ***!
-  \*****************************************************************/
+/*!*********************************************************!*\
+  !*** E:/newfile/newproject/pages.json?{"type":"style"} ***!
+  \*********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "首页" }, "pages/study/study": { "navigationBarTitleText": "学习" }, "pages/mine/mine": { "navigationBarTitleText": "我的" } }, "globalStyle": { "navigationBarTextStyle": "black", "navigationBarTitleText": "uni-app", "navigationBarBackgroundColor": "#F8F8F8", "backgroundColor": "#F8F8F8" } };exports.default = _default;
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "pages": { "pages/index/index": { "navigationBarTitleText": "首页" }, "pages/study/study": { "navigationBarTitleText": "学习" }, "pages/mine/mine": { "navigationBarTitleText": "我的" } }, "globalStyle": { "navigationBarTextStyle": "black", "navigationBarTitleText": "uni-app", "navigationBarBackgroundColor": "#58bc58", "backgroundColor": "#F8F8F8" } };exports.default = _default;
 
 /***/ }),
 /* 8 */
-/*!****************************************************************!*\
-  !*** D:/Mywork/workTest/newproject/pages.json?{"type":"stat"} ***!
-  \****************************************************************/
+/*!********************************************************!*\
+  !*** E:/newfile/newproject/pages.json?{"type":"stat"} ***!
+  \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "appid": "__UNI__756F46C" };exports.default = _default;
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = { "appid": "wxa992b45070eb5f33" };exports.default = _default;
 
 /***/ }),
 /* 9 */,
 /* 10 */,
 /* 11 */,
 /* 12 */
-/*!***************************************************!*\
-  !*** D:/Mywork/workTest/newproject/common/log.js ***!
-  \***************************************************/
+/*!*******************************************!*\
+  !*** E:/newfile/newproject/common/log.js ***!
+  \*******************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; // let log = wx.getRealtimeLogManager ? wx.getRealtimeLogManager() : null
+var log = wx.getRealtimeLogManager ? wx.getRealtimeLogManager() : null;
 
-var logger = wx.getRealtimeLogManager();
-logger.info({ str: 'hello world' }, 'info log', 100, [1, 2, 3]);
-logger.error({ str: 'hello world' }, 'error log', 100, [1, 2, 3]);
-logger.warn({ str: 'hello world' }, 'warn log', 100, [1, 2, 3]);var _default =
-{
-  // debug() {
-  //    if (!log) return
-  //    log.debug.apply(log, arguments)
-  //  },
+module.exports = {
   info: function info() {
-    //  if (!log) return
-    logger.info({ str: 'hello world' }, 'info log', 100, [1, 2, 3]);
-    //  log.info({str: 'info'}, 'info log', 100, [1, 2, 3])
+    if (!log) return;
+    log.info.apply(log, arguments);
   },
   warn: function warn() {
-    //  if (!log) return
-
-    //  log.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
-
-    logger.warn({ str: 'hello world' }, 'warn log', 100, [1, 2, 3]);
+    if (!log) return;
+    log.warn.apply(log, arguments);
   },
   error: function error() {
-    //  if (!log) return
-    //  log.error({str: 'error'}, 'error log', 100, [1, 2, 3])
-    logger.error({ str: 'hello world' }, 'error log', 100, [1, 2, 3]);
-
-  } };exports.default = _default;
+    if (!log) return;
+    log.error.apply(log, arguments);
+  },
+  setFilterMsg: function setFilterMsg(msg) {// 从基础库2.7.3开始支持
+    if (!log || !log.setFilterMsg) return;
+    if (typeof msg !== 'string') return;
+    log.setFilterMsg(msg);
+  },
+  addFilterMsg: function addFilterMsg(msg) {// 从基础库2.8.1开始支持
+    if (!log || !log.addFilterMsg) return;
+    if (typeof msg !== 'string') return;
+    log.addFilterMsg(msg);
+  } };
 
 /***/ }),
 /* 13 */,
@@ -8561,6 +8572,2226 @@ function normalizeComponent (
     options: options
   }
 }
+
+
+/***/ }),
+/* 16 */
+/*!**********************************************!*\
+  !*** E:/newfile/newproject/common/js/api.js ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0; // const apiRoot = "https://toefl.weixue100.com/";
+// const root = "https://api.weixue100.com/";
+var apiRoot = "https://pro.wisharedu.com/";
+var root = "https://api.wisharedu.com/";
+var api = {
+  // 首页接口
+  default: {
+    login: "".concat(apiRoot, "wxapp/default/login"),
+    banner: "".concat(apiRoot, "wxapp/default/banner"),
+    checkssk: "".concat(apiRoot, "wxapp/default/check-ssk"),
+    levelList: "".concat(apiRoot, "wxapp/category/level-list"),
+    getList: "".concat(apiRoot, "wxapp/category/get-list"),
+    getDetail: "".concat(apiRoot, "wxapp/diy/get-detail"),
+    getSubject: "".concat(apiRoot, "wxapp/diy/get-subject"),
+    addPic: "".concat(root, "toefl/default/poster") },
+
+
+  user: {
+    bind: "".concat(apiRoot, "wxapp/user/bind"),
+    unbind: "".concat(apiRoot, "wxapp/user/un-bind"),
+    verify: "".concat(apiRoot, "wxapp/user/verify"),
+    register: "".concat(apiRoot, "wxapp/user/register"),
+    checkPhone: "".concat(apiRoot, "wxapp/user/check-phone"),
+    changePassword: "".concat(apiRoot, "wxapp/user/change-password"),
+    code: "".concat(apiRoot, "wxapp/user/code"),
+    setUnion: "".concat(apiRoot, "wxapp/user/set-union"),
+    getCache: "".concat(apiRoot, "wxapp/user/get-cache"),
+    collect: "".concat(apiRoot, "wxapp/my/collect"),
+    userInfo: "".concat(apiRoot, "wxapp/user/user-info"),
+    notifyCategories: "".concat(apiRoot, "wxapp/user/notify-categories"),
+    notifyList: "".concat(apiRoot, "wxapp/user/notify-list"),
+    setCateRead: "".concat(apiRoot, "wxapp/user/set-cate-read"),
+    authExam: "".concat(apiRoot, "wxapp/record/auth-exam"),
+    bindInfo: "".concat(apiRoot, "wxapp/user/bind-info") },
+
+
+  feedback: {
+    cate: "".concat(apiRoot, "wxapp/feedback/cate"),
+    alioss: "".concat(apiRoot, "wxapp/feedback/alioss"),
+    post: "".concat(apiRoot, "wxapp/feedback/post") },
+
+
+  collect: {
+    addFavorite: "".concat(apiRoot, "wxapp/favorite/add-favorite"),
+    deleteFavorite: "".concat(apiRoot, "wxapp/favorite/delete-favorite") },
+
+
+  listen: {
+    exercise: "".concat(root, "toefl/listen/exercise"),
+    detail: "".concat(apiRoot, "wxapp/listen/detail"),
+    submit: "".concat(apiRoot, "wxapp/listen/submit"),
+    order: "".concat(apiRoot, "wxapp/listen/order"),
+    list: "".concat(apiRoot, "wxapp/listen/list"),
+    zOrder: "".concat(apiRoot, "wxapp/listen/z-order"),
+    zList: "".concat(apiRoot, "wxapp/listen/z-list"),
+    newOrder: "".concat(apiRoot, "wxapp/listen/new-order"),
+    newList: "".concat(apiRoot, "wxapp/listen/new-list"),
+    play: "".concat(apiRoot, "wxapp/listen/play") },
+
+
+  read: {
+    exercise: "".concat(root, "toefl/read/exercise"),
+    detail: "".concat(apiRoot, "wxapp/read/detail"),
+    submit: "".concat(apiRoot, "wxapp/read/submit"),
+    order: "".concat(apiRoot, "wxapp/read/order"),
+    list: "".concat(apiRoot, "wxapp/read/list"),
+    zOrder: "".concat(apiRoot, "wxapp/read/z-order"),
+    zList: "".concat(apiRoot, "wxapp/read/z-list"),
+    newOrder: "".concat(apiRoot, "wxapp/read/new-order"),
+    newList: "".concat(apiRoot, "wxapp/read/new-list") },
+
+
+  speaking: {
+    postExercise: "".concat(apiRoot, "wxapp/speaking/post-exercise"),
+    exercise: "".concat(root, "toefl/speak/exercise"),
+    result: "".concat(apiRoot, "wxapp/speaking/result"),
+    list: "".concat(apiRoot, "wxapp/speaking/list"),
+    order: "".concat(apiRoot, "wxapp/speaking/order") },
+
+  wrongNote: {
+    wrongIndex: "".concat(apiRoot, "wxapp/record/wrong-index"),
+    readWrong: "".concat(apiRoot, "wxapp/record/read-wrong"),
+    listenWrong: "".concat(apiRoot, "wxapp/record/listen-wrong"),
+    specialWrong: "".concat(apiRoot, "wxapp/record/special-wrong"),
+    delWrong: "".concat(apiRoot, "wxapp/record/wrong-del"),
+    readWrongDet: "".concat(apiRoot, "wxapp/record/read-wrong-detail"),
+    listenWrongDet: "".concat(apiRoot, "wxapp/record/listening-wrong-detail"),
+    specialWrongDet: "".concat(apiRoot, "wxapp/record/special-wrong-detail") },
+
+  favorite: {
+    volumeIndex: "".concat(apiRoot, "course/collection/volume-type-total"),
+    volumeList: "".concat(apiRoot, "course/collection/volume-list"),
+    volumeUpdata: "".concat(apiRoot, "course/collection/volume-update"),
+    volumeProgress: "".concat(apiRoot, "course/volume/volume-progress"),
+    readFav: "".concat(apiRoot, "wxapp/favorite/read-collect-record"),
+    listenFav: "".concat(apiRoot, "wxapp/favorite/listen-collect-record"),
+    collectFav: "".concat(apiRoot, "wxapp/favorite/count-collect") },
+
+
+  special: {
+    data: "".concat(apiRoot, "wxapp/special/data"),
+    exercise: "".concat(root, "toefl/special/exercise"),
+    submit: "".concat(apiRoot, "wxapp/special/submit"),
+    list: "".concat(apiRoot, "wxapp/special/list"),
+    check: "".concat(apiRoot, "wxapp/special/check"),
+    self: "".concat(apiRoot, "wxapp/special/self"),
+    setTotal: "".concat(apiRoot, "wxapp/special/set-total"),
+    postExercise: "".concat(apiRoot, "wxapp/special/post-exercise"),
+    exerciseVocab: "".concat(root, "toefl/special/exercise-vocab"),
+    getHistory: "".concat(apiRoot, "wxapp/special/get-history"),
+    answerTotal: "".concat(apiRoot, "wxapp/special/answer-total"),
+    getVocab: "".concat(root, "toefl/special/get-vocab"),
+    saveRecite: "".concat(root, "toefl/special/save-recite"),
+    vocabList: "".concat(root, "toefl/special/vocab"),
+    updateRecite: "".concat(root, "toefl/special/update-recite"),
+    getRecite: "".concat(root, "toefl/special/get-recite") },
+
+
+  record: {
+    wrongIndex: "".concat(apiRoot, "wxapp/record/wrong-index"),
+    answerCount: "".concat(apiRoot, "wxapp/record/answer-count"),
+    lastAnswer: "".concat(apiRoot, "wxapp/record/last-answer") },
+
+
+  upload: {
+    alioss: "".concat(apiRoot, "wxapp/upload/alioss") },
+
+  live: {
+    liveList: "".concat(apiRoot, "course/live/live-list"), // 直播列表接口
+    liveApplyRecord: "".concat(apiRoot, "course/live/apply-record"), // 直播预约列表
+    liveApply: "".concat(apiRoot, "course/live/live-apply"), // 预约直播接口
+    liveInfo: "".concat(apiRoot, "course/live/info"),
+    getApplyStatus: "".concat(apiRoot, "course/live/apply-status"),
+    liveViews: "".concat(apiRoot, "course/live/live-views") },
+
+  play: {
+    playList: "".concat(apiRoot, "course/volume/list"), // 资源卷列表接口
+    playInfo: "".concat(apiRoot, "course/volume/info"),
+    playVolumeRecord: "".concat(apiRoot, "course/volume/volume-record"),
+    playCreateVolume: "".concat(apiRoot, "course/volume/volume-rec-update"), // 创建卷
+    playUpdateSection: "".concat(apiRoot, "course/volume/item-rec-update"),
+    playVideoTs: "".concat(apiRoot, "course/volume/video-ts"),
+    playCloudList: "".concat(apiRoot, "course/volume/cloud-list"),
+    playFileList: "".concat(apiRoot, "course/volume/file-list"),
+    playCollectVolumeStatus: "".concat(apiRoot, "course/collection/volume-status"),
+    playVolumeRecommend: "".concat(apiRoot, "course/volume/recommend") },
+
+  glossary: {
+    glossarylist: "".concat(apiRoot, "wxapp/glossary/glossary-list"),
+    search: "".concat(apiRoot, "lexicon/default/search"),
+    delglossary: "".concat(apiRoot, "wxapp/glossary/del-glossary") },
+
+  homework: {
+    apiDetail: "".concat(root, "teaching/homework/api-detail"),
+    submitHomework: "".concat(apiRoot, "wxapp/homework/submit-homework"),
+    addResource: "".concat(apiRoot, "wxapp/homework/add-resource"),
+    delete: "".concat(apiRoot, "wxapp/homework/delete-resource"),
+
+
+    writingResult: "".concat(root, "toefl/write/result"), //获取写作结果
+    correctInfo: "".concat(root, "teaching/homework/correct"), //口语写作获取批改信息
+
+    //教师端用
+    teacher: {
+      unCorrect: "".concat(root, "teaching/homework/un-correct"), //待批改
+      info: "".concat(root, "teaching/homework/info"), //作业详情
+      updateCorrectFile: "".concat(root, "teaching/homework/update-correct-file"),
+      studentCorrect: "".concat(root, "teaching/homework/student-correct"), //当前学生和下一份
+      toeflResult: "".concat(root, "teaching/homework/toefl-result"),
+      correctHandle: "".concat(root, "teaching/homework/correct-handle") },
+
+    //homework测试接口用
+
+    index: {
+      // 首页
+      getClassList: "".concat(root, "teaching/class/user-class"),
+      getCourseList: "".concat(root, "teaching/course/list"),
+      getHomework: "".concat(root, "teaching/homework/list") },
+
+    classDetails: {
+      // 详情
+      getVideoList: "".concat(root, "teaching/course/video-list"),
+      updateVideoLog: "".concat(root, "teaching/course/save-video-log") },
+
+    allPlan: {
+      // 全部安排
+      getSchedule: "".concat(root, "teaching/schedule/single-list"),
+      getAllSchedule: "".concat(root, "teaching/schedule/all-list") } },
+
+
+  test: {
+    itemList: "".concat(root, "testing/exam/item-list"),
+    getExercise: "".concat(root, "testing/exam/get-exercise"),
+    checkVerifyCode: "".concat(root, "testing/exam/check-verify-code"),
+    postExercise: "".concat(root, "testing/exam/post-exercise"),
+    postOverTimeExam: "".concat(root, "testing/exam/post-over-time-exam"),
+    answerList: "".concat(root, "testing/exam/answer-list"),
+    answerResult: "".concat(root, "testing/exam/answer-result"),
+    analysis: "".concat(root, "testing/exam/analysis"),
+    answerQuestionList: "".concat(root, "testing/exam/answer-question-list") },
+
+  course: {
+    //课程计划详情
+    getCoursePlanView: "".concat(root, "courseplan/plan/view"),
+    //课程列表
+    getCoursePlanList: "".concat(root, "courseplan/plan/list"),
+    getUserPlanList: "".concat(root, "courseplan/plan/user-plan-list") },
+
+
+
+  order: {
+    //获取订单列表
+    getOrderList: "".concat(root, "courseplan/order/get-list"),
+    //加入免费班级 post
+    addFreeClass: "".concat(root, "courseplan/order/add-class"),
+    //取消订单接口 post
+    cancelOrder: "".concat(root, "courseplan/order/cancel-order"),
+    //创建订单接口 post
+    createOrder: "".concat(root, "courseplan/order/create-order"),
+    //检查支付是否成功
+    checkPay: "".concat(root, "courseplan/order/check-pay"),
+    //获取支付信息
+    getPay: "".concat(root, "courseplan/order/get-pay") } };var _default =
+
+
+
+api;exports.default = _default;
+
+/***/ }),
+/* 17 */
+/*!***********************************************!*\
+  !*** E:/newfile/newproject/common/js/http.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var _util = _interopRequireDefault(__webpack_require__(/*! ./util */ 18));
+var _constant = _interopRequireDefault(__webpack_require__(/*! ./constant */ 23));
+var _util2 = _interopRequireDefault(__webpack_require__(/*! ../../platforms/mp-weixin/util */ 20));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };} /**
+                                                                                                                                                                              * @desc 底层request函数
+                                                                                                                                                                              * @param option 弹出参数表，
+                                                                                                                                                                              {
+                                                                                                                                                                                     url : 同微信,
+                                                                                                                                                                                     data : 同微信,
+                                                                                                                                                                                     header : 同微信,
+                                                                                                                                                                                     method : 同微信,
+                                                                                                                                                                                     success : 同微信,
+                                                                                                                                                                                     fail : 同微信,
+                                                                                                                                                                                     complete : 同微信
+                                                                                                                                                                                }
+                                                                                                                                                                              * @param callback 回调函数，
+                                                                                                                                                                              * @date 2018/09/30 09:29:47
+                                                                                                                                                                              * @author honhaocheng
+                                                                                                                                                                              */function request(option, callback) {var ssk = _util.default.getParam("param").session,header = option.header ? option.header : { "content-type": "application/x-www-form-urlencoded" };header.version = _constant.default.version;header.ssk = ssk;option.url = "".concat(option.url, "?ssk=").concat(ssk);var data = option.data ? option.data : {};data.ssk = ssk;uni.request({ "url": option.url, "data": data, "method": option.method ? option.method : "GET", "header": header, "success": function success(response) {if (response.data.status == 401 || response.data.code == 403) {
+        _util2.default.loginCode(function () {
+          request(option, callback);
+        });
+      } else {
+        if (response.data.code == 0) {
+          option.success && typeof option.success == "function" && option.success(response);
+        } else {
+          option.fail && typeof option.fail == "function" && option.fail(response);
+        }
+      }
+    },
+    "fail": function fail(response) {
+      uni.getNetworkType({
+        success: function success(res) {
+          if (res.networkType == "none") {
+            uni.showModal({ title: "请检查网络是否正常" });
+          }
+        },
+        fail: function fail() {
+        } });
+
+    },
+    "complete": function complete(response) {
+      option.complete && typeof option.complete == "function" && option.complete(response);
+    } });
+
+}
+
+function requestPromise(action, method, header, data, _complete, callback) {
+  if (!data) {
+    data = {};
+  }
+  return new Promise(function (resolve, reject) {
+    request({
+      "url": action,
+      "data": data,
+      "method": method,
+      "header": header,
+      "success": function success(res) {
+        if (res.data.code == 0) {
+          resolve(res.data);
+        } else {
+          reject(res.data);
+        }
+      },
+      "fail": function fail(res) {
+        reject(res.data);
+      },
+      "complete": function complete() {
+        typeof _complete == "function" && _complete();
+      } },
+    callback);
+  });
+}
+
+function iget(action, param, header, complete, callback) {
+  return requestPromise(action, "GET", header, param, complete, callback);
+}
+
+function ipost(action, param, header, complete, callback) {
+  return requestPromise(action, "POST", header, param, complete, callback);
+}var _default =
+
+{ get: iget, post: ipost };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+/* 18 */
+/*!***********************************************!*\
+  !*** E:/newfile/newproject/common/js/util.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _path = _interopRequireDefault(__webpack_require__(/*! common/js/path */ 19));
+var _util = _interopRequireDefault(__webpack_require__(/*! platforms/mp-weixin/util */ 20));
+var _underscoreMin = _interopRequireDefault(__webpack_require__(/*! common/js/underscore-min */ 21));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var _default =
+{
+  formatTime: function formatTime(time) {
+    if (typeof time !== 'number' || time < 0) {
+      return time;
+    }
+
+    var hour = parseInt(time / 3600);
+    time = time % 3600;
+    var minute = parseInt(time / 60);
+    time = time % 60;
+    var second = time;
+
+    return [hour, minute, second].map(function (n) {
+      n = n.toString();
+      return n[1] ? n : '0' + n;
+    }).join(':');
+  },
+  formatLocation: function formatLocation(longitude, latitude) {
+    if (typeof longitude === 'string' && typeof latitude === 'string') {
+      longitude = parseFloat(longitude);
+      latitude = parseFloat(latitude);
+    }
+
+    longitude = longitude.toFixed(2);
+    latitude = latitude.toFixed(2);
+
+    return {
+      longitude: longitude.toString().split('.'),
+      latitude: latitude.toString().split('.') };
+
+  },
+  dateUtils: {
+    UNITS: {
+      '年': 31557600000,
+      '月': 2629800000,
+      '天': 86400000,
+      '小时': 3600000,
+      '分钟': 60000,
+      '秒': 1000 },
+
+    humanize: function humanize(milliseconds) {
+      var humanize = '';
+      for (var key in this.UNITS) {
+        if (milliseconds >= this.UNITS[key]) {
+          humanize = Math.floor(milliseconds / this.UNITS[key]) + key + '前';
+          break;
+        }
+      }
+      return humanize || '刚刚';
+    },
+    format: function format(dateStr) {
+      var date = this.parse(dateStr);
+      var diff = Date.now() - date.getTime();
+      if (diff < this.UNITS['天']) {
+        return this.humanize(diff);
+      }
+      var _format = function _format(number) {
+        return number < 10 ? '0' + number : number;
+      };
+      return date.getFullYear() + '/' + _format(date.getMonth() + 1) + '/' + _format(date.getDay()) + '-' +
+      _format(date.getHours()) + ':' + _format(date.getMinutes());
+    },
+    parse: function parse(str) {//将"yyyy-mm-dd HH:MM:ss"格式的字符串，转化为一个Date对象
+      var a = str.split(/[^0-9]/);
+      return new Date(a[0], a[1] - 1, a[2], a[3], a[4], a[5]);
+    } },
+
+  stotime: function stotime(s) {
+    //获取长度之后,转化成时间的格式
+    var t = "";
+    if (s > -1) {
+      var hour = Math.floor(s / 3600);
+      var min = Math.floor(s / 60) % 60;
+      var sec = Math.floor(s % 60);
+      if (s >= 3600) {
+        if (hour < 10) {
+          t += "0";
+        }
+        t += hour + ":";
+      }
+      if (min < 10) {
+        t += "0";
+      }
+      t += min + ":";
+      if (sec < 10) {
+        t += "0";
+      }
+      t += sec;
+    }
+    return t;
+  },
+  activityCountDown: function activityCountDown(name, currentTime, startTime) {
+    var str = "",
+    checktime = function checktime(i) {
+      if (i < 10) {
+        i = "0" + i;
+      } else
+      {
+        i = i;
+      }
+      return i;
+    };
+    var endtime = new Date(startTime),
+    nowtime = new Date(currentTime),
+    lefttime = parseInt(endtime.getTime() - nowtime.getTime()), //这是毫秒，如果再/1000就是秒
+    // 获取剩下的日、小时、分钟、秒钟
+    // 一天有多少毫秒，一小时有多少毫秒，一分钟有多少毫秒，一秒钟有多少毫秒
+    dm = 24 * 60 * 60 * 1000,
+    d = parseInt(lefttime / dm),
+    hm = 60 * 60 * 1000,
+    h = parseInt(lefttime / hm % 24),
+    mm = 60 * 1000,
+    m = parseInt(lefttime / mm % 60),
+    s = parseInt(lefttime / 1000 % 60);
+    m = checktime(m);
+    s = checktime(s);
+    str = "\u8DDD\u79BB".concat(name, "\u5F00\u59CB\u8FD8\u6709").concat(d, "\u5929").concat(h, "\u5C0F\u65F6").concat(m, "\u5206\u949F").concat(s, "\u79D2");
+    if (lefttime < 0) {
+      str = "".concat(name, "\u5DF2\u7ED3\u675F");
+    }
+    return str;
+  },
+  /**
+      * description 验证手机号格式是否正确
+      * param value 需要判断的值
+      */
+  isPoneAvailable: function isPoneAvailable(value) {
+    var myreg = /^[1][3-9][0-9]{9}$/;
+    if (!myreg.test(value)) {
+      return false;
+    } else {
+      return true;
+    }
+  },
+  /**
+      * @desc 判断是否含有中文字符
+      * @param str 字符串
+      * @date 2019/10/17 09:39:25
+      * @author honhaocheng
+      */
+  isChinese: function isChinese(str) {
+    var reg = new RegExp("[\\u4E00-\\u9FFF]+", "g");
+    if (reg.test(str)) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+  setFunc: function setFunc(vm, target, key, val) {
+    if (!target[key]) {
+      vm.$set(target, key, val);
+    } else {
+      target[key] = val;
+    }
+  },
+  delFunc: function delFunc(vm, target, key) {
+    if (target[key]) {
+      vm.$delete(target, key);
+    }
+  },
+  /**
+      * @desc toast简易封装(success)
+      * @param txt 提示文本
+      * @param ms 毫秒数
+      * @param icon 图标类型
+      * @date 2019/03/27 16:13:50
+      * @author honhaocheng
+      */
+  toastTipModal: function toastTipModal(txt) {var ms = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2000;var icon = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "success";
+    uni.showToast({
+      title: txt,
+      icon: icon,
+      duration: ms,
+      mask: true });
+
+  },
+  /**
+      * @desc toast简易封装(loading)
+      * @param txt 提示文本
+      * @date 2019/03/27 16:14:53
+      * @author honhaocheng
+      */
+  loadingTipModal: function loadingTipModal(txt) {
+    uni.showLoading({
+      title: txt,
+      mask: true });
+
+  },
+  /**
+      * @desc 获取指定缓存
+      * @param key 键值
+      * @date 2018/11/12 10:39:11
+      * @author honhaocheng
+      */
+  getParam: function getParam(key) {
+    try {
+      return uni.getStorageSync(key);
+    } catch (e) {
+      // Do something when catch error
+    }
+  },
+  /**
+      * description 获取当前页面栈
+      */
+  getPages: function getPages(obj) {
+    var authorityUrl = _path.default.common.authorityUrl;
+    if (obj && obj.url) {
+      uni.setStorageSync("login_pre_page", {
+        route: obj.url.slice(1),
+        options: obj.options || {},
+        openType: obj.openType || "redirectTo" });
+
+    } else {
+      var pages;
+      // 判断当前页面栈，存储上一个页面信息
+      if ((pages = getCurrentPages()).length) {
+        var r = pages[pages.length - 1];
+        r && authorityUrl.slice(1) != r.route && uni.setStorageSync("login_pre_page", _underscoreMin.default.pick(r, ["route", "options"]));
+      }
+    }
+    if (typeof obj.goAuthorityPage === "undefined") {
+      obj.goAuthorityPage = true;
+    }
+    // 调整至授权页面
+    obj.goAuthorityPage && uni.navigateTo({
+      url: authorityUrl });
+
+  },
+  /**
+      * description 通用页面栈跳转函数
+      */
+  jumpFunc: function jumpFunc() {
+    // 获取授权前访问的页面信息，若无直接访问首页
+    var t = uni.getStorageSync("login_pre_page"),
+    param = this.getParam("param"),
+    options = t.options;
+    if (param) {
+      if (!param.isBind) {
+        uni.navigateTo({
+          url: _path.default.common.signinUrl });
+
+      } else {
+        if (t && t.route) {
+          uni.removeStorageSync("login_pre_page");
+          if (Object.keys(options).length > 0) {
+            for (var key in options) {
+              t.route += t.route.indexOf("?") == -1 ? "?".concat(key, "=").concat(options[key]) : "&".concat(key, "=").concat(options[key]);
+            }
+          }
+          //跳转至授权前页面地址
+          if (t.openType) {
+            uni[t.openType]({
+              url: "/".concat(t.route) });
+
+          } else {
+            uni.reLaunch({
+              url: "/".concat(t.route) });
+
+          }
+        } else {
+          uni.reLaunch({
+            url: _path.default.common.indexUrl });
+
+        }
+      }
+    } else {
+      this.toastTipModal("网络异常，请重试！");
+    }
+
+  },
+  checkLogin: function checkLogin(obj) {
+
+    _util.default.checkLogin(obj);
+
+
+
+
+
+
+
+
+
+
+  },
+  publicCheckSession: function publicCheckSession(fn, jumpToBindFlag) {var _this2 = this;
+
+    _util.default.checkSession(function () {
+      var param = _this2.getParam("param");
+      if (!param.isBind && !param.hasUnion) {
+        _util.default.getUserInfoFunc(jumpToBindFlag);
+      } else if (param.isBind && !param.hasUnion) {
+        _util.default.getUserInfoFunc(jumpToBindFlag);
+      }
+      typeof fn === "function" && fn();
+    });
+
+  },
+  //js获取url传过来的参数值
+  getQueryStringV: function getQueryStringV(queryString, par) {
+    var setting = { name: par, queryString: queryString
+      // 如果链接没有参数，或者链接中不存在我们要获取的参数，直接返回空
+    };if (setting.queryString.indexOf("=") == -1 || setting.queryString.indexOf(setting.name + '=') == -1) {
+      return '';
+    }
+    // 获取链接中参数部分
+    var queryString = setting.queryString;
+    // 分离参数对 ?key=value&key2=value2
+    var parameters = queryString.split("&");
+    var pos, paraName, paraValue;
+    for (var i = 0; i < parameters.length; i++) {
+      // 获取等号位置
+      pos = parameters[i].indexOf('=');
+      if (pos == -1) {
+        continue;
+      }
+      // 获取name 和 value
+      paraName = parameters[i].substring(0, pos);
+      paraValue = parameters[i].substring(pos + 1);
+
+      if (paraName == setting.name) {
+        // return unescape(paraValue.replace(/\+/g, " "));
+        return decodeURIComponent(paraValue.replace(/\+/g, " "));
+      }
+    }
+    return '';
+
+  },
+  /**
+      * @随机字符串
+      * @param len
+      * @returns {string}
+      */
+  random_string: function random_string(len) {
+    var len = len || 32;
+    var chars = 'ABCDEFGHJKMNPQRSTWXYZabcdefhijkmnprstwxyz2345678';
+    var maxPos = chars.length;
+    var pwd = '';
+    for (var i = 0; i < len; i++) {
+      pwd += chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return pwd;
+  },
+  /**
+      * @时间戳转日期
+      * @param data
+      * @returns {string}
+      */
+  toLocaleString: function toLocaleString(data) {
+    return data.getFullYear() + "-" + (data.getMonth() + 1) + "-" + data.getDate() + "  " + data.getHours() + ":" + (data.getMinutes() > 10 ? data.getMinutes() : "0" + data.getMinutes());
+  },
+  /**
+      * @desc 查询指定节点的属性
+      * @param selector 选择器
+      * @param callback 回调函数
+      * @date 2018/11/16 14:03:57
+      * @author honhaocheng
+      */
+  queryNodeProperty: function queryNodeProperty(selector, callback) {
+    if (uni.canIUse("createSelectorQuery")) {
+      var query = uni.createSelectorQuery();
+      query.select(selector).boundingClientRect(function (res) {
+        typeof callback == "function" && callback(res);
+      }).exec();
+    }
+  },
+  /**
+      * @desc 清除定时器(新)
+      * @param vm vue内部this
+      * @param timerKeyArr 需要清除的定时器数组
+      * @param type 需要清除的定时器类型
+      * @date 2019/08/28 17:35:30
+      * @author honhaocheng
+      */
+  clearTimer: function clearTimer(vm, timerKeyArr) {var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "T";
+    timerKeyArr.forEach(function (key) {
+      if (vm[key]) {
+        type == "T" ? clearTimeout(vm[key]) : clearInterval(vm[key]);
+        vm[key] = null;
+      }
+    });
+  },
+  trim: function trim(str) {
+    return str.replace(/(^\s*)|(\s*$)/g, "");
+  },
+  /**
+      * @desc JS过滤HTML标签
+      * @param str 需要过滤的字符串
+      * @date 2019/09/03 12:04:02
+      * @author honhaocheng
+      */
+  filterHTMLTag: function filterHTMLTag(str) {
+    // 去除HTML Tag
+    str = str.replace(/<\/?[^>]*>/g, "");
+    // 去除行尾空格
+    str = str.replace(/[|]*\n/, "");
+    // 去掉npsp
+    str = str.replace(/&nbsp;/ig, "");
+    return str;
+  },
+  /**
+      * @desc 复制文本函数
+      * @param txt 文本
+      * @param fn 执行函数
+      * @date 2019/10/21 15:13:23
+      * @author honhaocheng
+      */
+  copyFunc: function copyFunc(txt, fn) {
+    uni.setClipboardData({
+      data: txt,
+      success: function success(res) {
+        typeof fn === "function" && fn();
+        uni.getClipboardData({
+          success: function success(res) {
+            // console.log(res.data) // data
+          } });
+
+      } });
+
+  },
+  /**
+      * @desc 获取当前页带参数的url
+      * @date 2019/09/03 12:11:57
+      * @author honhaocheng
+      */
+  getCurrentPageUrlWithArgs: function getCurrentPageUrlWithArgs() {
+    // 获取加载的页面
+    var pages = getCurrentPages(),
+    // 获取当前页面的对象
+    currentPage = pages[pages.length - 1],
+    // 当前页面url
+    url = currentPage.route,
+    // 如果要获取url中所带的参数可以查看options
+    options = currentPage.options;
+
+    // 拼接url的参数
+    var urlWithArgs = url + "?";
+    for (var key in options) {
+      var value = options[key];
+      urlWithArgs += key + "=" + value + "&";
+    }
+    urlWithArgs = urlWithArgs.substring(0, urlWithArgs.length - 1);
+
+    return urlWithArgs;
+  },
+  /**
+      * @desc 通用分享配置函数
+      * @param res 转发事件来源对象
+      * @date 2019/09/03 13:43:02
+      * @author honhaocheng
+      */
+  shareConfigFunc: function shareConfigFunc(res, shareObj) {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res.target);
+    }
+    return shareObj || {
+      title: "威学一百",
+      path: _path.default.common.indexUrl,
+      imageUrl: "" };
+
+  },
+  /**
+      * @desc 弹窗动画
+      * @param vm vue内部this
+      * @param status 区分是显示或关闭弹窗的属性
+      * @param animationKey 动画实例key
+      * @param setAnimationKey 设置动画实例key
+      * @param showModalKey 显示或隐藏弹窗key
+      * @date 2019/09/03 14:34:34
+      * @author honhaocheng
+      */
+  modalAnimationFunc: function modalAnimationFunc(vm, status, animationKey, setAnimationKey, showModalKey) {
+    /* 动画部分 */
+    // 第1步：创建动画实例
+    var animation = uni.createAnimation({
+      duration: 300, // 动画时长
+      timingFunction: "ease-in-out", // 动画以低速开始和结束
+      delay: 0 // 0则不延迟
+    });
+    // 第2步：这个动画实例赋给当前的动画实例
+    vm[animationKey] = animation;
+    // 第3步：执行第一组动画
+    animation.opacity(0).scale3d(0, 0, 0).step();
+    // 第4步：导出动画对象赋给数据对象储存
+    vm[setAnimationKey] = animation.export();
+    // 第5步：设置定时器到指定时候后，执行第二组动画
+    setTimeout(function () {
+      // 执行第二组动画
+      animation.opacity(1).scale3d(1, 1, 1).step();
+      // 给数据对象储存的第一组动画，更替为执行完第二组动画的动画对象
+      vm[setAnimationKey] = animation;
+      if (status == "close") {
+        vm[showModalKey] = false;
+      }
+    }, 200);
+    if (status == "open") {
+      vm[showModalKey] = true;
+    }
+  },
+  /**
+      * @desc 显示抽屉动画
+      * @param vm vue内部this
+      * @param status 区分是显示或关闭抽屉的属性
+      * @param animationKey 动画实例key
+      * @param setAnimationKey 设置动画实例key
+      * @param showDrawerKey 显示或隐藏抽屉key
+      * @date 2019/10/09 11:35:58
+      * @author honhaocheng
+      */
+  drawerAnimationFunc: function drawerAnimationFunc(vm, status, animationKey, setAnimationKey, showDrawerKey) {
+    /* 动画部分 */
+    // 第1步：创建动画实例
+    var animation = uni.createAnimation({
+      duration: 300, // 动画时长
+      timingFunction: "ease", // 线性
+      delay: 0 // 0则不延迟
+    });
+    // 第2步：这个动画实例赋给当前的动画实例
+    vm[animationKey] = animation;
+    // 第3步：执行第一组动画
+    animation.translate3d(0, "100%", 0).step();
+    // 第4步：导出动画对象赋给数据对象储存
+    vm[setAnimationKey] = animation.export();
+    // 第5步：设置定时器到指定时候后，执行第二组动画
+    setTimeout(function () {
+      // 执行第二组动画
+      animation.translate3d(0, 0, 0).step();
+      // 给数据对象储存的第一组动画，更替为执行完第二组动画的动画对象
+      vm[setAnimationKey] = animation;
+      if (status == "close") {
+        vm[showDrawerKey] = false;
+      }
+    }, 200);
+    if (status == "open") {
+      vm[showDrawerKey] = true;
+    }
+  },
+  //取消收藏
+  delCollect: function delCollect(ssk, id, _this) {
+    var subParam = {
+      ssk: ssk,
+      id: id };
+
+    // console.log(subParam);
+    _this.$http.get(_this.$api.collect.deleteFavorite, subParam).then(function (res) {
+
+    }).finally(function () {
+
+    });
+  },
+  //点击图片查看大图
+  clickImg: function clickImg(url, index) {
+    uni.previewImage({
+      urls: url, //需要预览的图片http链接列表，注意是数组
+      current: url[index], // 当前显示图片的http链接，默认是第一个
+      success: function success(res) {
+      },
+      fail: function fail(res) {
+      },
+      complete: function complete(res) {
+      } });
+
+  },
+  /**
+      * @desc 设置倒计时
+      * @date 2018/11/13 15:07:26
+      * @author honhaocheng
+      */
+  setCountDownTimer: function setCountDownTimer(vm, timerKey, TIME_COUNT, callback) {
+    if (!vm[timerKey]) {
+      var count = TIME_COUNT;
+      vm[timerKey] = setInterval(function () {
+        if (count > 0 && count <= TIME_COUNT) {
+          count--;
+          typeof callback === "function" && callback({ status: "timing", count: count });
+        } else {
+          clearInterval(vm[timerKey]);
+          vm[timerKey] = null;
+          typeof callback === "function" && callback({ status: "timeEnd", count: -1 });
+        }
+      }, 1000);
+    }
+  },
+  getPrevPage: function getPrevPage() {
+    var pages = getCurrentPages(),
+    prevPage = null;
+    if (pages.length > 1) {
+      prevPage = pages[pages.length - 2];
+    }
+    return prevPage;
+  } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+/* 19 */
+/*!***********************************************!*\
+  !*** E:/newfile/newproject/common/js/path.js ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
+  common: {
+    indexUrl: "/pages/common/index/index",
+    authorityUrl: "/pages/common/authority/authority",
+    signinUrl: "/pages/common/signin/signin",
+    signupUrl: "/pages/common/signup/signup",
+    resetUrl: "/pages/common/reset/reset" },
+
+  toefl: {
+    selectQuesTypeUrl: "/pages/toefl/select-ques-type/select-ques-type",
+    read: {
+      listUrl: "/pages/toefl/read/list/list",
+      exerciseUrl: "/pages/toefl/read/exercise/exercise",
+      resultUrl: "/pages/toefl/read/result/result" },
+
+    listen: {
+      listUrl: "/pages/toefl/listen/list/list",
+      exerciseUrl: "/pages/toefl/listen/exercise/exercise",
+      resultUrl: "/pages/toefl/listen/result/result",
+      detailListenUrl: "/pages/toefl/listen/detail-listen/detail-listen" },
+
+    speak: {
+      listUrl: "/pages/toefl/speak/list/list",
+      exerciseUrl: "/pages/toefl/speak/exercise/exercise" },
+
+    wrongNote: {
+      indexUrl: "/pages/toefl/wrong-note/index/index",
+      listUrl: "/pages/toefl/wrong-note/list/list",
+      listenUrl: "/pages/toefl/wrong-note/listen/listen",
+      readUrl: "/pages/toefl/wrong-note/read/read",
+      specialUrl: "/pages/toefl/wrong-note/special/special" },
+
+    favorite: {
+      indexUrl: "/pages/toefl/favorite/index/index",
+      listenDetailUrl: "/pages/toefl/favorite/listen-detail/listen-detail",
+      listenListUrl: "/pages/toefl/favorite/listen-list/listen-list",
+      listenTitleDetailUrl: "/pages/toefl/favorite/listen-title-detail/listen-title-detail",
+      readTitleDetailUrl: "/pages/toefl/favorite/read-title-detail/read-title-detail",
+      titleListUrl: "/pages/toefl/favorite/title-list/title-list",
+      videoListUrl: "/pages/toefl/favorite/video-list/video-list" },
+
+    word: {
+      indexUrl: "/pages/toefl/word/index/index",
+      listUrl: "/pages/toefl/word/list/list",
+      listenCheckUrl: "/pages/toefl/word/listen-check/listen-check",
+      listenDoUrl: "/pages/toefl/word/listen-do/listen-do",
+      listenResultUrl: "/pages/toefl/word/listen-result/listen-result",
+      listenSetUrl: "/pages/toefl/word/listen-set/listen-set",
+      readDoUrl: "/pages/toefl/word/read-do/read-do",
+      readResultUrl: "/pages/toefl/word/read-result/read-result",
+      writeDoUrl: "/pages/toefl/word/write-do/write-do",
+      writeResultUrl: "/pages/toefl/word/write-result/write-result",
+      reciteSetUrl: "/pages/toefl/word/recite-set/recite-set",
+      reciteDoUrl: "/pages/toefl/word/recite-do/recite-do" },
+
+    glossary: {
+      indexUrl: "/pages/toefl/glossary/index/index",
+      detailUrl: "/pages/toefl/glossary/detail/detail" } },
+
+
+  play: {
+    mpWeixin: {
+      playDetailsUrl: "/pages/play/mp-weixin/play-details/play-details",
+      coursePlayDetailsUrl: "/pages/play/mp-weixin/course-play-details/course-play-details" } },
+
+
+  live: {
+    mpWeixin: {
+      chatRoomUrl: "/pages/live/mp-weixin/chat-room/chat-room" },
+
+    liveDetailUrl: "/pages/live/live-detail/live-detail" },
+
+  mine: {
+    mineUrl: "/pages/mine/mine/mine",
+    feedbackUrl: "/pages/mine/feedback/feedback",
+    myliveUrl: "/pages/mine/mylive/mylive",
+    mynewsUrl: "/pages/mine/mynews/mynews",
+    correctUrl: "/pages/mine/correct/correct",
+    correctDetailUrl: "/pages/mine/correct-detail/correct-detail",
+    myOrder: "/pages/mine/my-order/my-order" //我的订单
+  },
+  test: {
+    listUrl: "/pages/test/list/list",
+    exerciseUrl: "/pages/test/exercise/exercise",
+    analysisUrl: "/pages/test/analysis/analysis",
+    resultUrl: "/pages/test/result/result" },
+
+  homework: {
+    learnHomeUrl: "/pages/homework/learn-home/learn-home",
+    // 全部安排页面
+    allPlan: {
+      allPlan: "/pages/homework/all-plan/all-plan",
+      classDetails: "/pages/homework/class-details/class-details" },
+
+    moveToPC: "/pages/homework/move-to-pc/move-to-pc",
+    writeUrl: "/pages/homework/write/write",
+    recordUrl: "/pages/homework/record/record" },
+
+
+  course: {
+    courseUrl: "/pages/course/course-detail/course-detail" } };exports.default = _default;
+
+/***/ }),
+/* 20 */
+/*!*********************************************************!*\
+  !*** E:/newfile/newproject/platforms/mp-weixin/util.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(uni) {Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _http = _interopRequireDefault(__webpack_require__(/*! common/js/http */ 17));
+var _api = _interopRequireDefault(__webpack_require__(/*! common/js/api */ 16));
+var _path = _interopRequireDefault(__webpack_require__(/*! common/js/path */ 19));
+var _util = _interopRequireDefault(__webpack_require__(/*! common/js/util */ 18));function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}var _default =
+
+{
+  getUpdataVerSion: function getUpdataVerSion() {
+    var updateManager = uni.getUpdateManager();
+    updateManager.onCheckForUpdate(function (res) {
+      // 请求完新版本信息的回调
+      // console.log(res.hasUpdate)
+    });
+    updateManager.onUpdateReady(function () {
+      uni.showModal({
+        title: '更新提示',
+        content: '有新版本的更新哦，是否重启应用？',
+        success: function success(res) {
+
+          if (res.confirm) {
+            // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+            updateManager.applyUpdate();
+          }
+        } });
+
+
+    });
+    updateManager.onUpdateFailed(function () {
+
+      // 新的版本下载失败
+    });
+  },
+  judgeAuthority: function judgeAuthority(callback) {
+    var authorityFlag = false;
+    // 查看是否授权
+    uni.getSetting({
+      success: function success(res) {
+        if (res.authSetting["scope.userInfo"]) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          authorityFlag = true;
+        } else {
+          authorityFlag = false;
+        }
+        // console.log(authorityFlag);
+        typeof callback == "function" && callback(authorityFlag);
+      } });
+
+  },
+  /**
+      * @desc 检测是否登录绑定
+      * @date 2019/07/25 17:13:28
+      * @author honhaocheng
+      */
+  checkLogin: function checkLogin(obj) {
+    var flag = true,
+    param = _util.default.getParam("param"),
+    url = obj.url,callback = obj.callback;
+    var authorityFlag = _util.default.getParam("authorityFlag");
+    if (!authorityFlag) {
+      _util.default.getPages(obj);
+      flag = false;
+    } else {
+      if (!param || param && !param.isBind || param && param.isBind && !param.hasUnion) {
+        obj.goAuthorityPage = false;
+        _util.default.getPages(obj);
+        uni.navigateTo({
+          url: _path.default.common.signinUrl });
+
+        flag = false;
+      } else {
+        if (obj.url) {
+          if (obj.openType === "reLaunch") {
+            uni.reLaunch({
+              url: url });
+
+          } else {
+            uni.navigateTo({
+              url: url });
+
+          }
+        }
+      }
+    }
+    typeof callback === "function" && callback(flag);
+  },
+  /**
+      * @desc 检测ssk有效性
+      * @param fn 传入执行的函数
+      * @date 2018/10/19 10:35:15
+      * @author honhaocheng
+      */
+  checkSession: function checkSession(fn) {var _this = this;
+    var param = _util.default.getParam("param"),
+    publicFunc = function publicFunc() {
+      typeof fn == "function" && fn();
+    };
+    uni.checkSession({
+      success: function success() {
+        //session_key 未过期，并且在本生命周期一直有效
+        if (param) {
+          _http.default.get(_api.default.default.checkssk, { ssk: param.session }).then(function (res) {
+            publicFunc();
+          }, function (res) {
+            _this.loginCode(function () {
+              publicFunc();
+            });
+          });
+        } else {
+          _this.loginCode(function () {
+            publicFunc();
+          });
+        }
+      },
+      fail: function fail() {
+        // session_key 已经失效，需要重新执行登录流程
+        _this.loginCode(function () {
+          publicFunc();
+        });
+      } });
+
+  },
+  /**
+      * @desc 获取ssk参数和绑定状态
+      * @param callback 回调函数
+      * @date 2018/11/12 10:38:40
+      * @author honhaocheng
+      */
+  loginCode: function loginCode(callback) {
+    uni.login({
+      success: function success(res) {
+        // console.log(res);
+        var code = res.code;
+        //发起网络请求
+        code && uni.request({
+          url: _api.default.default.login,
+          data: {
+            code: code },
+
+          success: function success(res) {
+            // console.log(res);
+            if (res && res.data && res.data.data) {
+              uni.setStorageSync("param", res.data.data);
+              if (typeof callback != "undefined") {
+                callback(res.data.data);
+              }
+            }
+          } });
+
+
+      } });
+
+  },
+  /**
+      * @desc 获取openID和unionID的缓存信息
+      * @param obj 用户相关信息对象
+      * @param jumpToBindFlag 是否需要跳转绑定
+      * @date 2019/07/25 16:30:04
+      * @author honhaocheng
+      */
+  getCacheFunc: function getCacheFunc(obj) {var _this2 = this;var jumpToBindFlag = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var param = _util.default.getParam("param");
+    _http.default.get(_api.default.user.getCache, {
+      ssk: param.session }).
+    then(function (resData) {
+      var cacheInfo = resData.data;
+      if (!cacheInfo.hasUnionid) {
+        _this2.setUnionIDAndUserInfoFunc(obj, cacheInfo);
+      } else if (cacheInfo.hasOpenid && cacheInfo.hasUnionid && jumpToBindFlag) {
+        _util.default.jumpFunc();
+      }
+    });
+  },
+  /**
+      * @desc 如果已经授权可以自动获取用户信息
+      * @param jumpToBindFlag 是否需要跳转绑定
+      * @date 2019/07/25 16:29:40
+      * @author honhaocheng
+      */
+  getUserInfoFunc: function getUserInfoFunc(jumpToBindFlag) {var _this3 = this;
+    var authorityFlag = _util.default.getParam("authorityFlag");
+    // 查看是否授权
+    if (authorityFlag) {
+      // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+      uni.getUserInfo({
+        success: function success(res) {
+          uni.setStorageSync("userInfo", { nickName: res.userInfo.nickName, avatarUrl: res.userInfo.avatarUrl });
+          _this3.getCacheFunc(res, jumpToBindFlag);
+        } });
+
+    }
+  },
+  /**
+      * @desc 设置unionID，老用户直接补全存到数据库，新用户存储到缓存
+      * @param obj 用户相关信息对象
+      * @param cacheInfo openID和unionID的缓存信息
+      * @date 2019/07/25 16:29:12
+      * @author honhaocheng
+      */
+  setUnionIDAndUserInfoFunc: function setUnionIDAndUserInfoFunc(obj, cacheInfo) {
+    this.updateParamHasUnionFunc(function () {
+      var param = _util.default.getParam("param");
+      // console.log(param);
+      // console.log(cacheInfo);
+      if (!param.hasUnion && !cacheInfo.hasUnionid) {
+        _util.default.loadingTipModal("处理中...");
+        //发起网络请求
+        var bindUnionParam = {
+          "ssk": param.session,
+          "userInfo[iv]": obj.iv,
+          "userInfo[encryptedData]": obj.encryptedData };
+
+        _http.default.post(_api.default.user.setUnion, bindUnionParam).then(function (resData) {
+          if (param.isBind) {
+            param.hasUnion = true;
+            uni.setStorageSync("param", param);
+            _util.default.jumpFunc();
+            // console.log(param);
+          } else {
+            uni.navigateTo({
+              url: _path.default.common.signinUrl });
+
+          }
+        }).finally(function () {
+          uni.hideLoading();
+        });
+      } else {
+        _util.default.jumpFunc();
+      }
+    });
+  },
+  /**
+      * @desc 更新param中的hasUnion的值
+      * @param fn 执行函数
+      * @date 2019/07/25 16:28:55
+      * @author honhaocheng
+      */
+  updateParamHasUnionFunc: function updateParamHasUnionFunc(fn) {
+    var param = _util.default.getParam("param");
+    _http.default.get(_api.default.user.bindInfo, {
+      ssk: param.session }).
+    then(function (resData) {
+      param.isBind = resData.data.isBind;
+      param.hasUnion = resData.data.hasUnionid;
+      uni.setStorageSync("param", param);
+      typeof fn == "function" && fn();
+    });
+  } };exports.default = _default;
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./node_modules/@dcloudio/uni-mp-weixin/dist/index.js */ 1)["default"]))
+
+/***/ }),
+/* 21 */
+/*!*********************************************************!*\
+  !*** E:/newfile/newproject/common/js/underscore-min.js ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__; //     Underscore.js 1.9.1
+//     http://underscorejs.org
+//     (c) 2009-2018 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+//     Underscore may be freely distributed under the MIT license.
+!function () {var n = "object" == typeof self && self.self === self && self || "object" == typeof global && global.global === global && global || this || {},r = n._,e = Array.prototype,o = Object.prototype,s = "undefined" != typeof Symbol ? Symbol.prototype : null,u = e.push,c = e.slice,p = o.toString,i = o.hasOwnProperty,t = Array.isArray,a = Object.keys,l = Object.create,f = function f() {},h = function h(n) {return n instanceof h ? n : this instanceof h ? void (this._wrapped = n) : new h(n);}; false || exports.nodeType ? n._ = h : ( true && !module.nodeType && module.exports && (exports = module.exports = h), exports._ = h), h.VERSION = "1.9.1";var v,y = function y(u, i, n) {if (void 0 === i) return u;switch (null == n ? 3 : n) {case 1:return function (n) {return u.call(i, n);};case 3:return function (n, r, t) {return u.call(i, n, r, t);};case 4:return function (n, r, t, e) {return u.call(i, n, r, t, e);};}return function () {return u.apply(i, arguments);};},d = function d(n, r, t) {return h.iteratee !== v ? h.iteratee(n, r) : null == n ? h.identity : h.isFunction(n) ? y(n, r, t) : h.isObject(n) && !h.isArray(n) ? h.matcher(n) : h.property(n);};h.iteratee = v = function v(n, r) {return d(n, r, 1 / 0);};var g = function g(u, i) {return i = null == i ? u.length - 1 : +i, function () {for (var n = Math.max(arguments.length - i, 0), r = Array(n), t = 0; t < n; t++) {r[t] = arguments[t + i];}switch (i) {case 0:return u.call(this, r);case 1:return u.call(this, arguments[0], r);case 2:return u.call(this, arguments[0], arguments[1], r);}var e = Array(i + 1);for (t = 0; t < i; t++) {e[t] = arguments[t];}return e[i] = r, u.apply(this, e);};},m = function m(n) {if (!h.isObject(n)) return {};if (l) return l(n);f.prototype = n;var r = new f();return f.prototype = null, r;},b = function b(r) {return function (n) {return null == n ? void 0 : n[r];};},j = function j(n, r) {return null != n && i.call(n, r);},x = function x(n, r) {for (var t = r.length, e = 0; e < t; e++) {if (null == n) return;n = n[r[e]];}return t ? n : void 0;},_ = Math.pow(2, 53) - 1,A = b("length"),w = function w(n) {var r = A(n);return "number" == typeof r && 0 <= r && r <= _;};h.each = h.forEach = function (n, r, t) {var e, u;if (r = y(r, t), w(n)) for (e = 0, u = n.length; e < u; e++) {r(n[e], e, n);} else {var i = h.keys(n);for (e = 0, u = i.length; e < u; e++) {r(n[i[e]], i[e], n);}}return n;}, h.map = h.collect = function (n, r, t) {r = d(r, t);for (var e = !w(n) && h.keys(n), u = (e || n).length, i = Array(u), o = 0; o < u; o++) {var a = e ? e[o] : o;i[o] = r(n[a], a, n);}return i;};var O = function O(c) {return function (n, r, t, e) {var u = 3 <= arguments.length;return function (n, r, t, e) {var u = !w(n) && h.keys(n),i = (u || n).length,o = 0 < c ? 0 : i - 1;for (e || (t = n[u ? u[o] : o], o += c); 0 <= o && o < i; o += c) {var a = u ? u[o] : o;t = r(t, n[a], a, n);}return t;}(n, y(r, e, 4), t, u);};};h.reduce = h.foldl = h.inject = O(1), h.reduceRight = h.foldr = O(-1), h.find = h.detect = function (n, r, t) {var e = (w(n) ? h.findIndex : h.findKey)(n, r, t);if (void 0 !== e && -1 !== e) return n[e];}, h.filter = h.select = function (n, e, r) {var u = [];return e = d(e, r), h.each(n, function (n, r, t) {e(n, r, t) && u.push(n);}), u;}, h.reject = function (n, r, t) {return h.filter(n, h.negate(d(r)), t);}, h.every = h.all = function (n, r, t) {r = d(r, t);for (var e = !w(n) && h.keys(n), u = (e || n).length, i = 0; i < u; i++) {var o = e ? e[i] : i;if (!r(n[o], o, n)) return !1;}return !0;}, h.some = h.any = function (n, r, t) {r = d(r, t);for (var e = !w(n) && h.keys(n), u = (e || n).length, i = 0; i < u; i++) {var o = e ? e[i] : i;if (r(n[o], o, n)) return !0;}return !1;}, h.contains = h.includes = h.include = function (n, r, t, e) {return w(n) || (n = h.values(n)), ("number" != typeof t || e) && (t = 0), 0 <= h.indexOf(n, r, t);}, h.invoke = g(function (n, t, e) {var u, i;return h.isFunction(t) ? i = t : h.isArray(t) && (u = t.slice(0, -1), t = t[t.length - 1]), h.map(n, function (n) {var r = i;if (!r) {if (u && u.length && (n = x(n, u)), null == n) return;r = n[t];}return null == r ? r : r.apply(n, e);});}), h.pluck = function (n, r) {return h.map(n, h.property(r));}, h.where = function (n, r) {return h.filter(n, h.matcher(r));}, h.findWhere = function (n, r) {return h.find(n, h.matcher(r));}, h.max = function (n, e, r) {var t,u,i = -1 / 0,o = -1 / 0;if (null == e || "number" == typeof e && "object" != typeof n[0] && null != n) for (var a = 0, c = (n = w(n) ? n : h.values(n)).length; a < c; a++) {null != (t = n[a]) && i < t && (i = t);} else e = d(e, r), h.each(n, function (n, r, t) {u = e(n, r, t), (o < u || u === -1 / 0 && i === -1 / 0) && (i = n, o = u);});return i;}, h.min = function (n, e, r) {var t,u,i = 1 / 0,o = 1 / 0;if (null == e || "number" == typeof e && "object" != typeof n[0] && null != n) for (var a = 0, c = (n = w(n) ? n : h.values(n)).length; a < c; a++) {null != (t = n[a]) && t < i && (i = t);} else e = d(e, r), h.each(n, function (n, r, t) {((u = e(n, r, t)) < o || u === 1 / 0 && i === 1 / 0) && (i = n, o = u);});return i;}, h.shuffle = function (n) {return h.sample(n, 1 / 0);}, h.sample = function (n, r, t) {if (null == r || t) return w(n) || (n = h.values(n)), n[h.random(n.length - 1)];var e = w(n) ? h.clone(n) : h.values(n),u = A(e);r = Math.max(Math.min(r, u), 0);for (var i = u - 1, o = 0; o < r; o++) {var a = h.random(o, i),c = e[o];e[o] = e[a], e[a] = c;}return e.slice(0, r);}, h.sortBy = function (n, e, r) {var u = 0;return e = d(e, r), h.pluck(h.map(n, function (n, r, t) {return { value: n, index: u++, criteria: e(n, r, t) };}).sort(function (n, r) {var t = n.criteria,e = r.criteria;if (t !== e) {if (e < t || void 0 === t) return 1;if (t < e || void 0 === e) return -1;}return n.index - r.index;}), "value");};var k = function k(o, r) {return function (e, u, n) {var i = r ? [[], []] : {};return u = d(u, n), h.each(e, function (n, r) {var t = u(n, r, e);o(i, n, t);}), i;};};h.groupBy = k(function (n, r, t) {j(n, t) ? n[t].push(r) : n[t] = [r];}), h.indexBy = k(function (n, r, t) {n[t] = r;}), h.countBy = k(function (n, r, t) {j(n, t) ? n[t]++ : n[t] = 1;});var S = /[^\ud800-\udfff]|[\ud800-\udbff][\udc00-\udfff]|[\ud800-\udfff]/g;h.toArray = function (n) {return n ? h.isArray(n) ? c.call(n) : h.isString(n) ? n.match(S) : w(n) ? h.map(n, h.identity) : h.values(n) : [];}, h.size = function (n) {return null == n ? 0 : w(n) ? n.length : h.keys(n).length;}, h.partition = k(function (n, r, t) {n[t ? 0 : 1].push(r);}, !0), h.first = h.head = h.take = function (n, r, t) {return null == n || n.length < 1 ? null == r ? void 0 : [] : null == r || t ? n[0] : h.initial(n, n.length - r);}, h.initial = function (n, r, t) {return c.call(n, 0, Math.max(0, n.length - (null == r || t ? 1 : r)));}, h.last = function (n, r, t) {return null == n || n.length < 1 ? null == r ? void 0 : [] : null == r || t ? n[n.length - 1] : h.rest(n, Math.max(0, n.length - r));}, h.rest = h.tail = h.drop = function (n, r, t) {return c.call(n, null == r || t ? 1 : r);}, h.compact = function (n) {return h.filter(n, Boolean);};var M = function M(n, r, t, e) {for (var u = (e = e || []).length, i = 0, o = A(n); i < o; i++) {var a = n[i];if (w(a) && (h.isArray(a) || h.isArguments(a))) {if (r) for (var c = 0, l = a.length; c < l;) {e[u++] = a[c++];} else M(a, r, t, e), u = e.length;} else t || (e[u++] = a);}return e;};h.flatten = function (n, r) {return M(n, r, !1);}, h.without = g(function (n, r) {return h.difference(n, r);}), h.uniq = h.unique = function (n, r, t, e) {h.isBoolean(r) || (e = t, t = r, r = !1), null != t && (t = d(t, e));for (var u = [], i = [], o = 0, a = A(n); o < a; o++) {var c = n[o],l = t ? t(c, o, n) : c;r && !t ? (o && i === l || u.push(c), i = l) : t ? h.contains(i, l) || (i.push(l), u.push(c)) : h.contains(u, c) || u.push(c);}return u;}, h.union = g(function (n) {return h.uniq(M(n, !0, !0));}), h.intersection = function (n) {for (var r = [], t = arguments.length, e = 0, u = A(n); e < u; e++) {var i = n[e];if (!h.contains(r, i)) {var o;for (o = 1; o < t && h.contains(arguments[o], i); o++) {;}o === t && r.push(i);}}return r;}, h.difference = g(function (n, r) {return r = M(r, !0, !0), h.filter(n, function (n) {return !h.contains(r, n);});}), h.unzip = function (n) {for (var r = n && h.max(n, A).length || 0, t = Array(r), e = 0; e < r; e++) {t[e] = h.pluck(n, e);}return t;}, h.zip = g(h.unzip), h.object = function (n, r) {for (var t = {}, e = 0, u = A(n); e < u; e++) {r ? t[n[e]] = r[e] : t[n[e][0]] = n[e][1];}return t;};var F = function F(i) {return function (n, r, t) {r = d(r, t);for (var e = A(n), u = 0 < i ? 0 : e - 1; 0 <= u && u < e; u += i) {if (r(n[u], u, n)) return u;}return -1;};};h.findIndex = F(1), h.findLastIndex = F(-1), h.sortedIndex = function (n, r, t, e) {for (var u = (t = d(t, e, 1))(r), i = 0, o = A(n); i < o;) {var a = Math.floor((i + o) / 2);t(n[a]) < u ? i = a + 1 : o = a;}return i;};var E = function E(i, o, a) {return function (n, r, t) {var e = 0,u = A(n);if ("number" == typeof t) 0 < i ? e = 0 <= t ? t : Math.max(t + u, e) : u = 0 <= t ? Math.min(t + 1, u) : t + u + 1;else if (a && t && u) return n[t = a(n, r)] === r ? t : -1;if (r != r) return 0 <= (t = o(c.call(n, e, u), h.isNaN)) ? t + e : -1;for (t = 0 < i ? e : u - 1; 0 <= t && t < u; t += i) {if (n[t] === r) return t;}return -1;};};h.indexOf = E(1, h.findIndex, h.sortedIndex), h.lastIndexOf = E(-1, h.findLastIndex), h.range = function (n, r, t) {null == r && (r = n || 0, n = 0), t || (t = r < n ? -1 : 1);for (var e = Math.max(Math.ceil((r - n) / t), 0), u = Array(e), i = 0; i < e; i++, n += t) {u[i] = n;}return u;}, h.chunk = function (n, r) {if (null == r || r < 1) return [];for (var t = [], e = 0, u = n.length; e < u;) {t.push(c.call(n, e, e += r));}return t;};var N = function N(n, r, t, e, u) {if (!(e instanceof r)) return n.apply(t, u);var i = m(n.prototype),o = n.apply(i, u);return h.isObject(o) ? o : i;};h.bind = g(function (r, t, e) {if (!h.isFunction(r)) throw new TypeError("Bind must be called on a function");var u = g(function (n) {return N(r, u, t, this, e.concat(n));});return u;}), h.partial = g(function (u, i) {var o = h.partial.placeholder,a = function a() {for (var n = 0, r = i.length, t = Array(r), e = 0; e < r; e++) {t[e] = i[e] === o ? arguments[n++] : i[e];}for (; n < arguments.length;) {t.push(arguments[n++]);}return N(u, a, this, this, t);};return a;}), (h.partial.placeholder = h).bindAll = g(function (n, r) {var t = (r = M(r, !1, !1)).length;if (t < 1) throw new Error("bindAll must be passed function names");for (; t--;) {var e = r[t];n[e] = h.bind(n[e], n);}}), h.memoize = function (e, u) {var i = function i(n) {var r = i.cache,t = "" + (u ? u.apply(this, arguments) : n);return j(r, t) || (r[t] = e.apply(this, arguments)), r[t];};return i.cache = {}, i;}, h.delay = g(function (n, r, t) {return setTimeout(function () {return n.apply(null, t);}, r);}), h.defer = h.partial(h.delay, h, 1), h.throttle = function (t, e, u) {var i,o,a,c,l = 0;u || (u = {});var f = function f() {l = !1 === u.leading ? 0 : h.now(), i = null, c = t.apply(o, a), i || (o = a = null);},n = function n() {var n = h.now();l || !1 !== u.leading || (l = n);var r = e - (n - l);return o = this, a = arguments, r <= 0 || e < r ? (i && (clearTimeout(i), i = null), l = n, c = t.apply(o, a), i || (o = a = null)) : i || !1 === u.trailing || (i = setTimeout(f, r)), c;};return n.cancel = function () {clearTimeout(i), l = 0, i = o = a = null;}, n;}, h.debounce = function (t, e, u) {var i,o,a = function a(n, r) {i = null, r && (o = t.apply(n, r));},n = g(function (n) {if (i && clearTimeout(i), u) {var r = !i;i = setTimeout(a, e), r && (o = t.apply(this, n));} else i = h.delay(a, e, this, n);return o;});return n.cancel = function () {clearTimeout(i), i = null;}, n;}, h.wrap = function (n, r) {return h.partial(r, n);}, h.negate = function (n) {return function () {return !n.apply(this, arguments);};}, h.compose = function () {var t = arguments,e = t.length - 1;return function () {for (var n = e, r = t[e].apply(this, arguments); n--;) {r = t[n].call(this, r);}return r;};}, h.after = function (n, r) {return function () {if (--n < 1) return r.apply(this, arguments);};}, h.before = function (n, r) {var t;return function () {return 0 < --n && (t = r.apply(this, arguments)), n <= 1 && (r = null), t;};}, h.once = h.partial(h.before, 2), h.restArguments = g;var I = !{ toString: null }.propertyIsEnumerable("toString"),T = ["valueOf", "isPrototypeOf", "toString", "propertyIsEnumerable", "hasOwnProperty", "toLocaleString"],B = function B(n, r) {var t = T.length,e = n.constructor,u = h.isFunction(e) && e.prototype || o,i = "constructor";for (j(n, i) && !h.contains(r, i) && r.push(i); t--;) {(i = T[t]) in n && n[i] !== u[i] && !h.contains(r, i) && r.push(i);}};h.keys = function (n) {if (!h.isObject(n)) return [];if (a) return a(n);var r = [];for (var t in n) {j(n, t) && r.push(t);}return I && B(n, r), r;}, h.allKeys = function (n) {if (!h.isObject(n)) return [];var r = [];for (var t in n) {r.push(t);}return I && B(n, r), r;}, h.values = function (n) {for (var r = h.keys(n), t = r.length, e = Array(t), u = 0; u < t; u++) {e[u] = n[r[u]];}return e;}, h.mapObject = function (n, r, t) {r = d(r, t);for (var e = h.keys(n), u = e.length, i = {}, o = 0; o < u; o++) {var a = e[o];i[a] = r(n[a], a, n);}return i;}, h.pairs = function (n) {for (var r = h.keys(n), t = r.length, e = Array(t), u = 0; u < t; u++) {e[u] = [r[u], n[r[u]]];}return e;}, h.invert = function (n) {for (var r = {}, t = h.keys(n), e = 0, u = t.length; e < u; e++) {r[n[t[e]]] = t[e];}return r;}, h.functions = h.methods = function (n) {var r = [];for (var t in n) {h.isFunction(n[t]) && r.push(t);}return r.sort();};var R = function R(c, l) {return function (n) {var r = arguments.length;if (l && (n = Object(n)), r < 2 || null == n) return n;for (var t = 1; t < r; t++) {for (var e = arguments[t], u = c(e), i = u.length, o = 0; o < i; o++) {var a = u[o];l && void 0 !== n[a] || (n[a] = e[a]);}}return n;};};h.extend = R(h.allKeys), h.extendOwn = h.assign = R(h.keys), h.findKey = function (n, r, t) {r = d(r, t);for (var e, u = h.keys(n), i = 0, o = u.length; i < o; i++) {if (r(n[e = u[i]], e, n)) return e;}};var q,K,z = function z(n, r, t) {return r in t;};h.pick = g(function (n, r) {var t = {},e = r[0];if (null == n) return t;h.isFunction(e) ? (1 < r.length && (e = y(e, r[1])), r = h.allKeys(n)) : (e = z, r = M(r, !1, !1), n = Object(n));for (var u = 0, i = r.length; u < i; u++) {var o = r[u],a = n[o];e(a, o, n) && (t[o] = a);}return t;}), h.omit = g(function (n, t) {var r,e = t[0];return h.isFunction(e) ? (e = h.negate(e), 1 < t.length && (r = t[1])) : (t = h.map(M(t, !1, !1), String), e = function e(n, r) {return !h.contains(t, r);}), h.pick(n, e, r);}), h.defaults = R(h.allKeys, !0), h.create = function (n, r) {var t = m(n);return r && h.extendOwn(t, r), t;}, h.clone = function (n) {return h.isObject(n) ? h.isArray(n) ? n.slice() : h.extend({}, n) : n;}, h.tap = function (n, r) {return r(n), n;}, h.isMatch = function (n, r) {var t = h.keys(r),e = t.length;if (null == n) return !e;for (var u = Object(n), i = 0; i < e; i++) {var o = t[i];if (r[o] !== u[o] || !(o in u)) return !1;}return !0;}, q = function q(n, r, t, e) {if (n === r) return 0 !== n || 1 / n == 1 / r;if (null == n || null == r) return !1;if (n != n) return r != r;var u = typeof n;return ("function" === u || "object" === u || "object" == typeof r) && K(n, r, t, e);}, K = function K(n, r, t, e) {n instanceof h && (n = n._wrapped), r instanceof h && (r = r._wrapped);var u = p.call(n);if (u !== p.call(r)) return !1;switch (u) {case "[object RegExp]":case "[object String]":return "" + n == "" + r;case "[object Number]":return +n != +n ? +r != +r : 0 == +n ? 1 / +n == 1 / r : +n == +r;case "[object Date]":case "[object Boolean]":return +n == +r;case "[object Symbol]":return s.valueOf.call(n) === s.valueOf.call(r);}var i = "[object Array]" === u;if (!i) {if ("object" != typeof n || "object" != typeof r) return !1;var o = n.constructor,a = r.constructor;if (o !== a && !(h.isFunction(o) && o instanceof o && h.isFunction(a) && a instanceof a) && "constructor" in n && "constructor" in r) return !1;}e = e || [];for (var c = (t = t || []).length; c--;) {if (t[c] === n) return e[c] === r;}if (t.push(n), e.push(r), i) {if ((c = n.length) !== r.length) return !1;for (; c--;) {if (!q(n[c], r[c], t, e)) return !1;}} else {var l,f = h.keys(n);if (c = f.length, h.keys(r).length !== c) return !1;for (; c--;) {if (l = f[c], !j(r, l) || !q(n[l], r[l], t, e)) return !1;}}return t.pop(), e.pop(), !0;}, h.isEqual = function (n, r) {return q(n, r);}, h.isEmpty = function (n) {return null == n || (w(n) && (h.isArray(n) || h.isString(n) || h.isArguments(n)) ? 0 === n.length : 0 === h.keys(n).length);}, h.isElement = function (n) {return !(!n || 1 !== n.nodeType);}, h.isArray = t || function (n) {return "[object Array]" === p.call(n);}, h.isObject = function (n) {var r = typeof n;return "function" === r || "object" === r && !!n;}, h.each(["Arguments", "Function", "String", "Number", "Date", "RegExp", "Error", "Symbol", "Map", "WeakMap", "Set", "WeakSet"], function (r) {h["is" + r] = function (n) {return p.call(n) === "[object " + r + "]";};}), h.isArguments(arguments) || (h.isArguments = function (n) {return j(n, "callee");});var D = n.document && n.document.childNodes; true && "object" != typeof Int8Array && "function" != typeof D && (h.isFunction = function (n) {return "function" == typeof n || !1;}), h.isFinite = function (n) {return !h.isSymbol(n) && isFinite(n) && !isNaN(parseFloat(n));}, h.isNaN = function (n) {return h.isNumber(n) && isNaN(n);}, h.isBoolean = function (n) {return !0 === n || !1 === n || "[object Boolean]" === p.call(n);}, h.isNull = function (n) {return null === n;}, h.isUndefined = function (n) {return void 0 === n;}, h.has = function (n, r) {if (!h.isArray(r)) return j(n, r);for (var t = r.length, e = 0; e < t; e++) {var u = r[e];if (null == n || !i.call(n, u)) return !1;n = n[u];}return !!t;}, h.noConflict = function () {return n._ = r, this;}, h.identity = function (n) {return n;}, h.constant = function (n) {return function () {return n;};}, h.noop = function () {}, h.property = function (r) {return h.isArray(r) ? function (n) {return x(n, r);} : b(r);}, h.propertyOf = function (r) {return null == r ? function () {} : function (n) {return h.isArray(n) ? x(r, n) : r[n];};}, h.matcher = h.matches = function (r) {return r = h.extendOwn({}, r), function (n) {return h.isMatch(n, r);};}, h.times = function (n, r, t) {var e = Array(Math.max(0, n));r = y(r, t, 1);for (var u = 0; u < n; u++) {e[u] = r(u);}return e;}, h.random = function (n, r) {return null == r && (r = n, n = 0), n + Math.floor(Math.random() * (r - n + 1));}, h.now = Date.now || function () {return new Date().getTime();};var L = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#x27;", "`": "&#x60;" },P = h.invert(L),W = function W(r) {var t = function t(n) {return r[n];},n = "(?:" + h.keys(r).join("|") + ")",e = RegExp(n),u = RegExp(n, "g");return function (n) {return n = null == n ? "" : "" + n, e.test(n) ? n.replace(u, t) : n;};};h.escape = W(L), h.unescape = W(P), h.result = function (n, r, t) {h.isArray(r) || (r = [r]);var e = r.length;if (!e) return h.isFunction(t) ? t.call(n) : t;for (var u = 0; u < e; u++) {var i = null == n ? void 0 : n[r[u]];void 0 === i && (i = t, u = e), n = h.isFunction(i) ? i.call(n) : i;}return n;};var C = 0;h.uniqueId = function (n) {var r = ++C + "";return n ? n + r : r;}, h.templateSettings = { evaluate: /<%([\s\S]+?)%>/g, interpolate: /<%=([\s\S]+?)%>/g, escape: /<%-([\s\S]+?)%>/g };var J = /(.)^/,U = { "'": "'", "\\": "\\", "\r": "r", "\n": "n", "\u2028": "u2028", "\u2029": "u2029" },V = /\\|'|\r|\n|\u2028|\u2029/g,$ = function $(n) {return "\\" + U[n];};h.template = function (i, n, r) {!n && r && (n = r), n = h.defaults({}, n, h.templateSettings);var t,e = RegExp([(n.escape || J).source, (n.interpolate || J).source, (n.evaluate || J).source].join("|") + "|$", "g"),o = 0,a = "__p+='";i.replace(e, function (n, r, t, e, u) {return a += i.slice(o, u).replace(V, $), o = u + n.length, r ? a += "'+\n((__t=(" + r + "))==null?'':_.escape(__t))+\n'" : t ? a += "'+\n((__t=(" + t + "))==null?'':__t)+\n'" : e && (a += "';\n" + e + "\n__p+='"), n;}), a += "';\n", n.variable || (a = "with(obj||{}){\n" + a + "}\n"), a = "var __t,__p='',__j=Array.prototype.join," + "print=function(){__p+=__j.call(arguments,'');};\n" + a + "return __p;\n";try {t = new Function(n.variable || "obj", "_", a);} catch (n) {throw n.source = a, n;}var u = function u(n) {return t.call(this, n, h);},c = n.variable || "obj";return u.source = "function(" + c + "){\n" + a + "}", u;}, h.chain = function (n) {var r = h(n);return r._chain = !0, r;};var G = function G(n, r) {return n._chain ? h(r).chain() : r;};h.mixin = function (t) {return h.each(h.functions(t), function (n) {var r = h[n] = t[n];h.prototype[n] = function () {var n = [this._wrapped];return u.apply(n, arguments), G(this, r.apply(h, n));};}), h;}, h.mixin(h), h.each(["pop", "push", "reverse", "shift", "sort", "splice", "unshift"], function (r) {var t = e[r];h.prototype[r] = function () {var n = this._wrapped;return t.apply(n, arguments), "shift" !== r && "splice" !== r || 0 !== n.length || delete n[0], G(this, n);};}), h.each(["concat", "join", "slice"], function (n) {var r = e[n];h.prototype[n] = function () {return G(this, r.apply(this._wrapped, arguments));};}), h.prototype.value = function () {return this._wrapped;}, h.prototype.valueOf = h.prototype.toJSON = h.prototype.value, h.prototype.toString = function () {return String(this._wrapped);},  true && !(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = (function () {return h;}).apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));}();
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! (webpack)/buildin/global.js */ 3), __webpack_require__(/*! (webpack)/buildin/module.js */ 22)(module)))
+
+/***/ }),
+/* 22 */
+/*!***********************************!*\
+  !*** (webpack)/buildin/module.js ***!
+  \***********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if (!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if (!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 23 */
+/*!***************************************************!*\
+  !*** E:/newfile/newproject/common/js/constant.js ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });exports.default = void 0;var _default = {
+  version: "1.0",
+  letters: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
+  toefl: {
+    TPO_ROOT: {
+      TPO: 3,
+      ZTPO: 165,
+      NEW_TPO: 813 },
+
+    /**************根类型，【1】托福【12】GRE****************/
+    ROOT: 1,
+    /**************听力所有题型全局变量****************/
+    LISTEN: {
+      SINGLE_QUES_TYPE: 1, // 单选题
+      MULTIPLE_QUES_TYPE: 2, // 多选题
+      SORT_QUES_TYPE: 12, // 排序题
+      DETAIL_QUES_TYPE: 13 // 过程细节题
+    },
+    /**************阅读所有题型全局变量****************/
+    READ: {
+      SINGLR_CHOICE_QUES_TYPE: 1, // 单选题
+      MULTIPLE_CHOICE_QUES_TYPE: 2, // 多选题
+      INSERT_QUES_TYPE: 11, // 插入题
+      SIX_SELECT_THREE_QUES_TYPE: 3, // 六选三
+      SEVEN_SELECT_FIVE_TYPE: 4 // 七选五
+    } },
+
+  test: {
+    SINGLE_CHOICE_QUESTION_TYPE: 1,
+    MULTIPLE_CHOICE_QUESTION_TYPE: 2,
+    FILL_BLANK_QUESTION_TYPE: 3,
+    AUDIO_UNDERSTAND_QUESTION_TYPE: 5 } };exports.default = _default;
+
+/***/ }),
+/* 24 */,
+/* 25 */,
+/* 26 */,
+/* 27 */,
+/* 28 */,
+/* 29 */,
+/* 30 */,
+/* 31 */,
+/* 32 */,
+/* 33 */,
+/* 34 */,
+/* 35 */,
+/* 36 */,
+/* 37 */,
+/* 38 */,
+/* 39 */,
+/* 40 */,
+/* 41 */,
+/* 42 */,
+/* 43 */,
+/* 44 */,
+/* 45 */
+/*!**********************************************************!*\
+  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(/*! regenerator-runtime */ 46);
+
+
+/***/ }),
+/* 46 */
+/*!************************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime-module.js ***!
+  \************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// This method of obtaining a reference to the global object needs to be
+// kept identical to the way it is obtained in runtime.js
+var g = (function() {
+  return this || (typeof self === "object" && self);
+})() || Function("return this")();
+
+// Use `getOwnPropertyNames` because not all browsers support calling
+// `hasOwnProperty` on the global `self` object in a worker. See #183.
+var hadRuntime = g.regeneratorRuntime &&
+  Object.getOwnPropertyNames(g).indexOf("regeneratorRuntime") >= 0;
+
+// Save the old regeneratorRuntime in case it needs to be restored later.
+var oldRuntime = hadRuntime && g.regeneratorRuntime;
+
+// Force reevalutation of runtime.js.
+g.regeneratorRuntime = undefined;
+
+module.exports = __webpack_require__(/*! ./runtime */ 47);
+
+if (hadRuntime) {
+  // Restore the original runtime.
+  g.regeneratorRuntime = oldRuntime;
+} else {
+  // Remove the global property added by runtime.js.
+  try {
+    delete g.regeneratorRuntime;
+  } catch(e) {
+    g.regeneratorRuntime = undefined;
+  }
+}
+
+
+/***/ }),
+/* 47 */
+/*!*****************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime.js ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+!(function(global) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  var inModule = typeof module === "object";
+  var runtime = global.regeneratorRuntime;
+  if (runtime) {
+    if (inModule) {
+      // If regeneratorRuntime is defined globally and we're in a module,
+      // make the exports object identical to regeneratorRuntime.
+      module.exports = runtime;
+    }
+    // Don't bother evaluating the rest of this file if the runtime was
+    // already defined globally.
+    return;
+  }
+
+  // Define the runtime globally (as expected by generated code) as either
+  // module.exports (if we're in a module) or a new, empty object.
+  runtime = global.regeneratorRuntime = inModule ? module.exports : {};
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  runtime.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunctionPrototype[toStringTagSymbol] =
+    GeneratorFunction.displayName = "GeneratorFunction";
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+  }
+
+  runtime.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  runtime.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      if (!(toStringTagSymbol in genFun)) {
+        genFun[toStringTagSymbol] = "GeneratorFunction";
+      }
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  runtime.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return Promise.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return Promise.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new Promise(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  runtime.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  runtime.async = function(innerFn, outerFn, self, tryLocsList) {
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList)
+    );
+
+    return runtime.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        if (delegate.iterator.return) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  Gp[toStringTagSymbol] = "Generator";
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  runtime.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  runtime.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+})(
+  // In sloppy mode, unbound `this` refers to the global object, fallback to
+  // Function constructor if we're in global strict mode. That is sadly a form
+  // of indirect eval which violates Content Security Policy.
+  (function() {
+    return this || (typeof self === "object" && self);
+  })() || Function("return this")()
+);
 
 
 /***/ })

@@ -9,9 +9,8 @@
 		}, {
 			"path": "pages/study/study",
 			"style": {
-				"navigationBarTitleText": "学习"
+				"navigationBarTitleText": "学习"	
 			}
-
 
 		}, {
 			"path": "pages/mine/mine",
@@ -23,7 +22,7 @@
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "uni-app",
-		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationBarBackgroundColor": "#58bc58",
 		"backgroundColor": "#F8F8F8"
 	},
 	"tabBar": {
@@ -48,4 +47,5 @@
 			"text": "我的"
 		}]
 	}
+		
 }

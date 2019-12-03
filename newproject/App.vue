@@ -1,27 +1,35 @@
 <script>
 import log from "./common/log.js";
 export default {
-  onLaunch: function() {
-    console.log("App Launch");
-  },
-  onShow: function() {
-    console.log("App Show");
-    log.info("user info1"); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-    log.warn("sss1");
-    log.error("error1");
-    // log.setFilterMsg('filterkeyword')
-    // log.setFilterMsg('addfilterkeyword')
-  },
-  onHide: function() {
-    console.log("App Hide");
-    console.log(1);
-    log.info("user info"); // 日志会和当前打开的页面关联，建议在页面的onHide、onShow等生命周期里面打
-    log.error("error");
-    log.warn("sss");
-  }
+    onLaunch() {
+        console.log("App Launch");
+        // throw new Error('test')
+        wx.setEnableDebug({
+            enableDebug: true,
+            success: (res) =>{
+                console.log(res);
+                log.error('enableDebug',res);
+            }
+        });
+       
+   
+    },
+    onShow() {
+        console.log("App Show");
+    },
+    onHide() {
+        console.log("App Hide");
+	},
+	methods: {
+		
+	}
 };
 </script>
 
-<style>
+<style lang="scss">
+@import "common/scss/base.scss";
+@import "common/font/iconfont.css";
+@import "common/scss/common.scss";
+
 /*每个页面公共css */
 </style>
