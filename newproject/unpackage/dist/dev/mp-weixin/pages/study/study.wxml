@@ -1,1 +1,0 @@
-<view><view class="f26">学习页面</view><button data-event-opts="{{[['tap',[['btn',['$event']]]]]}}" bindtap="__e">学习按钮</button></view>

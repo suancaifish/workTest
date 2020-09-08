@@ -1270,67 +1270,56 @@ text, view {
 }
 .flex {
   display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
   display: -webkit-flex;
 }
 .fcolumn {
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
           flex-direction: column;
   -webkit-flex-direction: column;
 }
 .flex1 {
   -webkit-box-flex: 1;
-      -ms-flex: 1;
           flex: 1;
   -webkit-flex: 1;
 }
 .freverse {
   -webkit-box-orient: horizontal;
   -webkit-box-direction: reverse;
-      -ms-flex-direction: row-reverse;
           flex-direction: row-reverse;
   -webkit-flex-direction: row-reverse;
 }
 .h-center {
   -webkit-box-pack: center;
-      -ms-flex-pack: center;
           justify-content: center;
   -webkit-justify-content: center;
 }
 .v-center {
   -webkit-box-align: center;
-      -ms-flex-align: center;
           align-items: center;
   -webkit-align-items: center;
 }
 .hv-center {
   -webkit-box-pack: center;
-      -ms-flex-pack: center;
           justify-content: center;
   -webkit-justify-content: center;
   -webkit-box-align: center;
-      -ms-flex-align: center;
           align-items: center;
   -webkit-align-items: center;
 }
 .between {
   -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-justify-content: space-between;
 }
 .f-start {
   -webkit-box-pack: start;
-      -ms-flex-pack: start;
           justify-content: flex-start;
   -webkit-justify-content: flex-start;
 }
 .f-end {
   -webkit-box-pack: end;
-      -ms-flex-pack: end;
           justify-content: flex-end;
   -webkit-justify-content: flex-end;
 }
@@ -1382,12 +1371,11 @@ text, view {
   background: #fc9103;
 }
 .orange-gradient {
-  background: -o-linear-gradient(315deg, #ff6c00, #fc9103);
+  background: -webkit-linear-gradient(315deg, #ff6c00, #fc9103);
   background: linear-gradient(135deg, #ff6c00, #fc9103);
 }
 .view-wrap {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  flex-wrap: wrap;
   -webkit-flex-wrap: wrap;
 }
 .wrap {
@@ -1396,21 +1384,17 @@ text, view {
 /*水平0.5px细线*/
 .hr.scale-half {
   height: 1rpx;
-  -ms-transform: scaleY(0.5);
-      transform: scaleY(0.5);
+  transform: scaleY(0.5);
   -webkit-transform: scaleY(0.5);
-  -ms-transform-origin: 50% 100%;
-      transform-origin: 50% 100%;
+  transform-origin: 50% 100%;
   -webkit-transform-origin: 50% 100%;
 }
 /*垂直0.5px细线*/
 .v-hr.scale-half {
   width: 1rpx;
-  -ms-transform: scaleX(0.5);
-      transform: scaleX(0.5);
+  transform: scaleX(0.5);
   -webkit-transform: scaleX(0.5);
-  -ms-transform-origin: 50% 100%;
-      transform-origin: 50% 100%;
+  transform-origin: 50% 100%;
   -webkit-transform-origin: 50% 100%;
 }
 .mask {
@@ -1437,8 +1421,7 @@ text, view {
   /*超出部分隐藏*/
   white-space: nowrap;
   /*不换行*/
-  -o-text-overflow: ellipsis;
-     text-overflow: ellipsis;
+  text-overflow: ellipsis;
   /*超出部分文字以...显示*/
 }
 .clearfix:after {
@@ -1451,8 +1434,7 @@ button::after {
   border: none !important;
 }
 .shadow {
-  -webkit-box-shadow: 0 0 5rpx #eee;
-          box-shadow: 0 0 5rpx #eee;
+  box-shadow: 0 0 5rpx #eee;
 }
 /*登录、注册、找回密码通用样式开始*/
 .input-placeholder {

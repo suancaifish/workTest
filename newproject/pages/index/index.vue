@@ -1,81 +1,88 @@
 <template>
-    <view>
-        <view class>index</view>
-        <!-- <view
-            class="br10 shadow pt60 pr30 pb30 pl30 rel mt30"
-            v-for="item in currentModuleData"
-            :key="item.name"
-        >
-            <view class="title f26" @click="tips">{{item.name}}</view>
-        </view>-->
-        <!-- <view class>{{name}}</view> -->
-        <view class>hello,{{name2}}</view>
-        <button @click="doIt">doIt</button>
-    </view>
+	<view class="f30">
+		<view class="index-modules-content-item br10 shadow pt60 pr30 pb30 pl30 rel mt30" @click="checkCourseDetail" v-for="(item,index) in data"
+		 :key="index">
+			<view class="index-modules-content-item-label abs left0 top0  pr20 pl20 h40 lh40 btrr2000 bbrr2000 f24 colororange tc">课程</view>
+			<view class="f30 b textEllipsis">{{item.name}}</view>
+			<!-- 教师头像信息 -->
+			<view class="flex">
+				<view class="flex v-center pt30 " v-for="(item2,ind) in item.teacherInfo" :key="ind" v-show="ind<1">
+					<image :src="item2.avatar" class="w64 h64 br50-percent"></image>
+					<text class="pl10 f24 w100 textEllipsis">{{item2.nickName}}</text>
+				</view>
+			</view>
+
+
+
+
+
+		</view>
+
+
+	</view>
+	</view>
 </template>
 
 <script>
-import BaseButton from "components/base-button/base-button";
-export default {
-    components: {},
-    data() {
-        return {
-            currentModuleData: ""
-        };
-    },
-    components: {
-        BaseButton //基础按钮组件：传text按钮值进去，点击事件clickBtn
-    },
-   
-    onShow() {
-        this.update();
-    },
-    computed: {
-        name2() {
-            return y;
-        }
-    },
-    methods: {
-      
-        doIt() {
-            return cjw
-        },
-        update() {
-            this.$http
-                .get(
-                    `${this.$api.course.getCoursePlanList}?page=${
-                        this.page
-                    }&size=${3}&tagID=${7}`,
-                    { "Content-Type": "application/json;charset=UTF-8" }
-                )
-                .then(res => {
-			
-                    this.currentModuleData = res.data.list;
-                });
-        },
-        tips() {
-            uni.showActionSheet({
-                itemList: ["huahua", "fafa", "baba"],
-                itemColor: "#59bc58",
-                success: res => {
-                    console.log("选中了第" + (res.tapIndex + 1) + "个按钮");
-                },
-                fail: res => {
-                    console.log(res.errMsg);
-                }
-            });
-        }
-    }
-};
+	// import CourseModule from "@/components/course-module/course-module";
+	import {
+		datalist
+	} from './DATA/data.js'
+
+
+
+
+	export default {
+		// components: { CourseModule },
+		data() {
+			return {
+				// data: datalist[0].list
+				data: []
+			};
+		},
+		components: {},
+		created() {
+			this.getList()
+
+		},
+		mounted() {
+			console.log(this.data)
+		},
+		methods: {
+			checkCourseDetail() {
+				console.log('点击课程')
+			},
+			// https://toefl.weixue100.com/wxapp/diy/get-detail?ssk=DSEmSaRD_HcRuRlg&thirdID=3
+			getList() {
+				setTimeout(() => {
+					this.$http.get(`https://toefl.weixue100.com/wxapp/diy/get-detail?ssk=DSEmSaRD_HcRuRlg&thirdID=3`, {
+						"Content-Type": "application/json;charset=UTF-8"
+					}).then(res => {
+						console.log(res.data.modules[0].list);
+						this.data = res.data.modules[0].list;
+					})
+				}, 7000);
+
+			}
+
+		}
+	};
 </script>
 
 <style>
-uni-page-body {
-    background-color: #f4f4f4;
-}
+	uni-page-body {
+		background-color: #f4f4f4;
+	}
 
-.p10 {
-    padding: 10px;
-    font-size: 16px;
-}
+	.p10 {
+		padding: 10px;
+		font-size: 16px;
+	}
+
+	.index-modules-content-item {
+		margin: 15rpx auto;
+		text-align: center;
+		width: 80%;
+		background-color: #ccc;
+	}
 </style>

@@ -22,7 +22,7 @@ const user = {
 			let password = utils.getmd5(userInfo.password.trim());
 			return new Promise((resolve, reject) => {
 				login({username, password}).then(response => {
-					const data = response.data;
+					const data = response.data; 
 					commit('SET_TOKEN', data.access_token);
 					commit('SET_USERINFO', data);
 					utils.setToken(data.access_token); //本地保存token

@@ -1,13 +1,13 @@
 {
   "pages": [
     "pages/index/index",
-    "pages/study/study",
+    "pages/study/study/study",
     "pages/mine/mine"
   ],
   "subPackages": [],
   "window": {
     "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uni-app",
+    "navigationBarTitleText": "suancaifish",
     "navigationBarBackgroundColor": "#58bc58",
     "backgroundColor": "#F8F8F8"
   },
@@ -24,7 +24,7 @@
         "text": "首页"
       },
       {
-        "pagePath": "pages/study/study",
+        "pagePath": "pages/study/study/study",
         "iconPath": "static/logo.png",
         "selectedIconPath": "static/logo.png",
         "text": "学习"
@@ -37,5 +37,6 @@
       }
     ]
   },
-  "usingComponents": {}
+  "usingComponents": {},
+  "sitemapLocation": "sitemap98.json"
 }

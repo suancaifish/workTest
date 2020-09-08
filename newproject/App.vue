@@ -3,16 +3,6 @@ import log from "./common/log.js";
 export default {
     onLaunch() {
         console.log("App Launch");
-        // throw new Error('test')
-        wx.setEnableDebug({
-            enableDebug: true,
-            success: (res) =>{
-                console.log(res);
-                log.error('enableDebug',res);
-            }
-        });
-       
-   
     },
     onShow() {
         console.log("App Show");

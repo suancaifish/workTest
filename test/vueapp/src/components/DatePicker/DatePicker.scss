@@ -1,0 +1,37 @@
+.hello{
+    width: 800px;
+    margin:  auto;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+   .weeks{
+       justify-content: space-between;
+       .date{
+        flex-basis: (100% / 7);
+
+       }
+   }
+}
+.currentmonths{
+    flex-wrap: wrap;
+    justify-content: flex-start;
+   
+    .day{
+        box-sizing: border-box;
+        flex-basis: (100% / 7);
+        display: flex;
+        justify-content: center;
+        .day-item{
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            .item{
+                display: inline-block ;
+                
+            }
+        }
+    }
+}
+.active{
+    background-color: pink;
+}

@@ -1,0 +1,20 @@
+@import '~antd/dist/antd.css';
+
+
+
+#root{
+
+  height: 100% !important;
+}
+.App{
+  height: 100% !important;
+
+}
+.ant-layout-has-sider{
+  height: 100% !important;
+}
+#components-layout-demo-side .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}

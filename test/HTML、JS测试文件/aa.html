@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+
+
+</head>
+
+<body>
+    <audio id="audio" src="./第一个音频.mp3" autoplay="autoplay">
+        Your browser does not support the audio element.
+    </audio>
+    <canvas id="canvas" width="1920" height="600">
+        Your browser does not support Canvas tag.
+    </canvas>
+    <input id="fileChooser" type="file" />
+    <button  id="bofnag">播放</button>
+</body>
+
+<style>
+
+</style>
+
+
+<script src="./jquery.js"></script>
+<!-- <script>
+    $('#test').on('mousemove', function (e) {
+        var offset = $('#test').offset()
+        var x = e.pageX - offset.left
+        var y = e.pageY - offset.top
+
+        var centerX = $('#test').outerWidth() / 3
+        var centerY = $('#test').outerHeight() / 3
+
+        var deltaX = x - centerX
+        var deltaY = y - centerY
+
+        var percentX = deltaX / centerX
+        var percentY = deltaY / centerY
+        var deg = 5
+
+        $('#banner').css({
+            transform: 'rotateX(' + deg * -percentY + 'deg)' +
+                ' rotateY(' + deg * percentX + 'deg)'
+        })
+    })
+
+    $('#test').on('mouseleave', function () {
+        $('#banner').css({
+            transform: ''
+        })
+    })
+</script> -->
+
+
+<!-- <script src="./测试//sass/node_modules/eruda/eruda.js"></script> -->
+<script>
+    let AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioContext = new AudioContext();
+    let analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    analyser = audioContext.createAnalyser();
+
+    let audio = document.getElementById('audio');
+    let audioSrc = audioContext.createMediaElementSource(audio);
+    audioSrc.connect(analyser);
+    analyser.connect(audioContext.destination);
+    let canvas = document.getElementById('canvas');
+
+    let ctx = canvas.getContext("2d");
+    ctx.lineWidth = 2;
+    let grd = ctx.createLinearGradient(100, 0, 600, 0);
+    grd.addColorStop(0, "#00d0ff");
+    grd.addColorStop(1, "#eee");
+
+    let grd2 = ctx.createLinearGradient(0, 0, 600, 0);
+    grd2.addColorStop(0, "#fff");
+    grd2.addColorStop(1, "#e720ee");
+    let het = 0;
+
+    var globalID;
+
+    function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        ctx.beginPath();
+        for (let i = 0; i < 200; i++) {
+            let value = dataArray[6 * i];
+            ctx.fillStyle = grd;
+            ctx.fillRect(i * 5, 300, 2, -value + 1);
+            ctx.fillRect(i * 5, 280 - value, 2, het);
+            ctx.fillStyle = grd2;
+            ctx.fillRect(i * 5, 300, 2, value + 1);
+            ctx.fillRect(i * 5, 320 + value, 2, het);
+        }
+        globalID = requestAnimationFrame(render);
+    };
+    globalID = requestAnimationFrame(render);
+
+
+    var fileChange = document.getElementById('fileChooser');
+    fileChange.onchange = fileChange = (e) => {
+        if (e.target.files[0]) {
+            let playfile = URL.createObjectURL(e.target.files[0]);
+            audio.src = playfile;
+            let musicName = e.target.files[0].name.split('.')[0];
+            audio.play();
+        }
+    };
+
+
+    document.querySelector('#bofnag').onclick=()=>{
+        audio.play();
+    }
+
+</script>
+
+
+
+</html>

@@ -1,0 +1,34 @@
+.hello {
+  width: 800px;
+  margin: auto;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+.hello .weeks {
+  justify-content: space-between;
+}
+.hello .weeks .date {
+  flex-basis: 14.28571%;
+}
+.currentmonths {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.currentmonths .day {
+  box-sizing: border-box;
+  flex-basis: 14.28571%;
+  display: flex;
+  justify-content: center;
+}
+.currentmonths .day .day-item {
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+.currentmonths .day .day-item .item {
+  display: inline-block;
+}
+.active {
+  background-color: pink;
+}

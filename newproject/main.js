@@ -13,24 +13,28 @@ import path from './common/js/path'
 Vue.prototype.$path = path;
 import mpweixinUtil from './platforms/mp-weixin/util'
 Vue.prototype.$mpweixinUtil = mpweixinUtil;
-import log from "./common/log.js";
+
+// import log from './common/log.js'
+// var fundebug = require('./common/fundebug.1.3.1.min.js');
+// fundebug.init({
+// 	apikey: '1215155',
+// 	callback: function(event) {
+//         log.error('event.error',event.error)
+//     }
+// })
+// //系统错误捕获
+// const errorHandler = (error, vm, info) => {
+	
+// 	// log.error('error11==>', error);
+// 	// log.info('info11==>', info);
+// }
+// Vue.config.errorHandler = errorHandler;
+// Vue.prototype.$throw = (error) => errorHandler(error, this);
 
 App.mpType = 'app'
 
 
-
-Vue.config.errorHandler = (err, vm, info) => {
-    console.log(`baba: ${err}\nInfo: ${info}`);
-    log.info(`baba ${vm}`)
-    log.error(`ERROR: ${err.toString()} `)
-    log.error(`ERROR-INFO: ${info}`)
-}
-Vue.config.warnHandler = (msg, vm, trace) => {
-    log.warn('WARN ', msg)
-    log.info('WARN trace', trace);
-}
-
 const app = new Vue({
-    ...App
+	...App
 })
 app.$mount()

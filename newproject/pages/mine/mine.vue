@@ -1,22 +1,22 @@
 <template>
     <view>
         <view class="f26">我的页面</view>
+        <div>ffff</div>
+        
     </view>
 </template>
 
 <script>
-import log from "../../common/log.js";
+
+
 export default {
-    components: {},
+    components: {  },
     data() {
         return {
-            isok: true,
-            data: ["ps", "css"]
+            isok: true
         };
-	},
-	created(){
-		
-	},
+    },
+    created() {},
 
     onShow() {},
     methods: {}

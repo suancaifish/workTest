@@ -3,25 +3,30 @@
 		{
 			"path": "pages/index/index",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "首页",
+				"navigationBarBackgroundColor":"#ffc3cb"
 			}
-
-		}, {
-			"path": "pages/study/study",
+		},
+		{
+			"path": "pages/study/study/study",
 			"style": {
-				"navigationBarTitleText": "学习"	
+				"navigationBarTitleText": "学习",
+				"navigationBarBackgroundColor":"#88afca",
+				"enablePullDownRefresh":true
 			}
-
-		}, {
+		},
+		{
 			"path": "pages/mine/mine",
 			"style": {
-				"navigationBarTitleText": "我的"
+				"navigationBarTitleText": "我的",
+				"navigationBarBackgroundColor":"#90cdf2"
+
 			}
 		}
 	],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
+		"navigationBarTitleText": "suancaifish",
 		"navigationBarBackgroundColor": "#58bc58",
 		"backgroundColor": "#F8F8F8"
 	},
@@ -31,21 +36,31 @@
 		"borderStyle": "black",
 		"backgroundColor": "#ffffff",
 		"list": [{
-			"pagePath": "pages/index/index",
-			"iconPath": "static/logo.png",
-			"selectedIconPath": "static/logo.png",
-			"text": "首页"
-		}, {
-			"pagePath": "pages/study/study",
-			"iconPath": "static/logo.png",
-			"selectedIconPath": "static/logo.png",
-			"text": "学习"
-		}, {
-			"pagePath": "pages/mine/mine",
-			"iconPath": "static/logo.png",
-			"selectedIconPath": "static/logo.png",
-			"text": "我的"
+				"pagePath": "pages/index/index",
+				"iconPath": "static/logo.png",
+				"selectedIconPath": "static/logo.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/study/study/study",
+				"iconPath": "static/logo.png",
+				"selectedIconPath": "static/logo.png",
+				"text": "学习"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"iconPath": "static/logo.png",
+				"selectedIconPath": "static/logo.png",
+				"text": "我的"
+			}
+		]
+	},
+	"subpackages": [{
+		"root": "pageA/studypages",
+		"pages": [{
+			"path": "StudyDate/StudyDate"
 		}]
-	}
-		
+	}]
+
+
 }
