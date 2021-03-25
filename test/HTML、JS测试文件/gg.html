@@ -1,0 +1,210 @@
+<html>
+
+<head>
+    <title>getDevices() workaround in Chrome81</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Language" content="zh-CN" />
+    <script type="text/javascript" src="http://files.cnblogs.com/Zjmainstay/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="http://files.cnblogs.com/Zjmainstay/ThunderURIEncode.js"></script>
+
+</head>
+
+<body style="cursor:none">
+
+    <!-- <div>
+        <label>audio input device:</label>
+        <select id="audioSource"></select>
+    </div>
+    <div>
+        <label>audio output device:</label>
+        <select id="audioOutput"></select>
+    </div>
+    <div>
+        <label>video input device:</label>
+        <select id="videoSource"></select>
+    </div>-->
+
+    <div id="device_info"></div>
+</body>
+
+<!-- <body>
+    <input type="text" size="150" id="orig_url" def-v="这里填入文件地址" value="这里填入文件地址"></input>
+    <input type="text" size="150" id="thunder_url" def-v="点击获取后这里生成迅雷网址" value="点击获取后这里生成迅雷网址"></input>
+    <input type="button" id="create_url" value="获取迅雷网址"></input>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("input").css({
+                "float": "left",
+                "clear": "both"
+            });
+            $("#orig_url").click(function () {
+                if ($.trim($(this).val()) == $(this).attr('def-v')) $(this).val('');
+            })
+            $("#orig_url").blur(function () {
+                if ($.trim($(this).val()) == '') $(this).val($(this).attr('def-v'));
+            })
+            $("#thunder_url").click(function () {
+                $(this).select();
+            })
+            $("#create_url").click(function () {
+                var url = $.trim($("#orig_url").val());
+                if (url != '这里填入文件地址') {
+                    $("#thunder_url").val(ThunderURIEncode(url));
+                    var a = $('<a href="' + ThunderURIEncode(url) + '">点击下载</a>').css({
+                        "float": "left",
+                        "padding": "3px"
+                    });
+                    $("#create_url").siblings("a").remove();
+                    $("#create_url").after(a);
+                }
+            })
+        });
+    </script>
+
+</body> -->
+
+<script src="./AgoraRTC.js"></script>
+<script>
+    // console.log(navigator.mediaDevices);
+    // if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+    //     console.log("不支持 enumerateDevices() .");
+
+    // } else {
+    //     // 列出相机和麦克风。
+
+    //     navigator.mediaDevices.enumerateDevices()
+    //         .then(function (devices) {
+    //             console.log("devices", devices)
+    //             devices.forEach(function (device) {
+    //                 console.log(device.kind + ": " + device.label +
+    //                     " id = " + device.deviceId);
+    //             });
+    //         })
+    //         .catch(function (err) {
+    //             console.log(err.name + ": " + err.message);
+    //         });
+    // }
+
+    //创建临时视频流 音频流 激活浏览器使用音频视频权限
+
+
+
+
+
+
+    const tempAudioStream = AgoraRTC.createStream({
+        audio: true,
+        video: false
+    });
+    const tempVideoStream = AgoraRTC.createStream({
+        audio: false,
+        video: true
+    });
+
+    const audioPermissionOK = new Promise(resolve => {
+        tempAudioStream.init(() => resolve(null), (e) => resolve(e));
+    });
+    const videoPermissionOK = new Promise(resolve => {
+        tempVideoStream.init(() => resolve(null), (e) => resolve(e));
+    });
+
+    Promise.all([audioPermissionOK, videoPermissionOK]).then(res => {
+        console.log("Promise.all ~ res", res)
+        if (res[0] !== null) {
+
+            console.warn("create audio temp stream failed!", res[0]);
+        }
+        if (res[1] !== null) {
+            console.warn("create video temp stream failed!", res[0]);
+        }
+
+        const devices = AgoraRTC.getDevices(info => {
+            // tempAudioStream.close();
+            // tempVideoStream.close();
+            document.getElementById("device_info").innerText = JSON.stringify(info);
+        });
+    });
+
+
+
+    // navigator.mediaDevices.getUserMedia({
+    //         audio: true,
+    //         video: true
+    //     })
+    //     .then(function (stream) {
+    //         console.log(".then ~ stream", stream)
+    //         /* 使用这个stream stream */
+    //         console.log('成功');
+    //         aa()
+    //     })
+    //     .catch(function (err) {
+    //         console.log("err", err)
+    //         /* 处理error */
+    //         console.log('失败');
+
+    //     });
+
+
+
+    // function aa() {
+    //     var audioSource = document.querySelector("select#audioSource");
+    //     var audioOutput = document.querySelector("select#audioOutput");
+    //     var videoSource = document.querySelector("select#videoSource");
+
+    //     if (
+    //         !navigator.mediaDevices ||
+    //         !navigator.mediaDevices.enumerateDevices
+    //     ) {
+    //         console.log("emurateDevices is not support!");
+    //     } else {
+    //         navigator.mediaDevices
+    //             .enumerateDevices()
+    //             .then((gotDevices) => {
+    //                 console.log(
+    //                     "navigator.mediaDevices.enumerateDevices ~ gotDevices",
+    //                     gotDevices
+    //                 );
+    //                 agotDevices(gotDevices);
+    //             })
+    //             .catch((handleError) => {
+    //                 console.log("handleError", handleError);
+    //             });
+    //     }
+
+    //     let agotDevices = (devicesInfo) => {
+    //         devicesInfo.forEach((item) => {
+    //             console.log('item', item);
+
+    //             // if (
+    //             //     item.deviceId != "default" &&
+    //             //     item.deviceId != "communications"
+    //             // ) {
+    //             //     console.log('item',item);
+    //             //     // console.log(
+    //             //     //     item.kind +
+    //             //     //     ": label = " +
+    //             //     //     item.label +
+    //             //     //     ": id  = " +
+    //             //     //     item.deviceId +
+    //             //     //     ": groupId = " +
+    //             //     //     item.groupId
+    //             //     // );
+    //             // }
+
+    //             var option = document.createElement("option");
+    //             option.html = item.label;
+    //             option.value = item.deviceId;
+
+    //             if (item.kind === "audioinput") {
+    //                 audioSource.appendChild(option);
+    //             } else if (item.kind === "audiooutput") {
+    //                 audioOutput.appendChild(option);
+    //             } else if (item.kind === "videoinput") {
+    //                 videoSource.appendChild(option);
+    //             }
+    //         });
+    //     };
+    // }
+</script>
+
+</html>

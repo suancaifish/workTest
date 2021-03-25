@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<input type="button" name="123" onclick="downloadUrlFile('https://oss.weixue100.com/live/cloudRecoding/10020/e1ab97106247a47917d478a7261bda6e_0006-0079-D696-20FE_0.mp4')">
+</body>
+</html>
+<script type="text/javascript">
+	/**
+     * 获取页面文件名
+     * @param url 文件url
+     */
+    function downloadUrlFile(url) {
+      url= url.replace(/\\/g, '/');
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', url, true);
+      xhr.responseType = 'blob';
+      //xhr.setRequestHeader('Authorization', 'Basic a2VybWl0Omtlcm1pdA==');
+      xhr.onprogress =  (event)=> {
+          if (event.lengthComputable) {
+            console.log(event.loaded);
+            console.log(event.total);     }
+        };
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          // 获取文件blob数据并保存
+          var fileName = getFileName(url);
+          saveAs(xhr.response, fileName);
+        }
+      };
+
+      xhr.send();
+    }
+
+    /**
+     * URL方式保存文件到本地
+     * @param data 文件的blob数据
+     * @param name 文件名
+     */
+    function saveAs(data, name) {
+        var urlObject = window.URL || window.webkitURL || window;
+        var export_blob = new Blob([data]);
+
+        var save_link = document.createElementNS('http://www.w3.org/1999/xhtml', 'a')
+        save_link.href = urlObject.createObjectURL(export_blob);
+        save_link.download = name;
+        save_link.click();
+    }
+
+    /**
+     * 根据文件url获取文件名
+     * @param url 文件url
+     */
+    function getFileName(url)
+    {
+        var num = url.lastIndexOf('/')+1
+        var fileName = url.substring(num)
+        //把参数和文件名分割开
+        fileName = decodeURI(fileName.split("?")[0]);
+        return fileName;
+    }
+
+
+
+</script>

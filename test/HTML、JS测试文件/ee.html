@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=" utf-8" />
+    <meta name="author" content="http://www.softwhy.com/" />
+    <title>11111</title>
+    <style type="text/css"></style>
+</head>
+
+<body>
+    <div id="root"></div>
+</body>
+<script src="./react/react.production.min.js"></script>
+<script src="./react/react-dom.production.min.js"></script>
+
+<!-- Don't use this in production: -->
+<script src="./react/babel.min.js"></script>
+<script type="text/babel">
+    class App extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    myName: "花22花",
+                };
+            }
+
+            click2 = () => {
+                this.setState({
+                    myName: "粑粑",
+                });
+                // 调用 子组件方法
+                this.refs.erzi.mySingleFunction();
+            };
+            render() {
+                return (
+                    <div>
+
+                        <MyCompoment1
+                            name={this.state.myName}
+                            click2={this.click2}
+                            ref="erzi"
+                        />
+                    </div>
+                );
+            }
+        }
+
+        class MyCompoment1 extends React.Component {
+            constructor(props) {
+                super(props);
+                this.state = {
+                    conut: 1,
+                    aa: [1, 2, 3, 4, 5, 6],
+                };
+            }
+            componentDidMount() {}
+            activateLasers = () => {
+                let b = this.state.aa;
+                b.push(b[b.length - 1] + 1);
+                this.setState({
+                    conut: this.state.conut + 1,
+                    aa: b,
+                });
+
+                console.log(this);
+                this.props.click2();
+            };
+            mySingleFunction() {
+                console.log("这是子组件专用的方法");
+            }
+
+            render() {
+                return (
+                    <div>
+                        <ul style={{ height: 300 + "px",width:600+'px' }}>
+                            {this.state.aa.map((number) => (
+                                <span style={{padding:5+'px',margin:'0px 5px',background:'#ccc'}} key={number}>{number}</span>
+                            ))}
+                        </ul>
+                        <h2>{this.props.name + this.state.conut}</h2>
+                        <h3>点击计数{this.state.conut}</h3>
+                        <button onClick={this.activateLasers}>Like</button>
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+
+</html>

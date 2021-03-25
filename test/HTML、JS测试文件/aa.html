@@ -4,123 +4,814 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-
-
-
+    <link rel="stylesheet" href="./css.css">
 </head>
-
-<body>
-    <audio id="audio" src="./第一个音频.mp3" autoplay="autoplay">
-        Your browser does not support the audio element.
-    </audio>
-    <canvas id="canvas" width="1920" height="600">
-        Your browser does not support Canvas tag.
-    </canvas>
-    <input id="fileChooser" type="file" />
-    <button  id="bofnag">播放</button>
-</body>
-
 <style>
-
-</style>
-
-
-<script src="./jquery.js"></script>
-<!-- <script>
-    $('#test').on('mousemove', function (e) {
-        var offset = $('#test').offset()
-        var x = e.pageX - offset.left
-        var y = e.pageY - offset.top
-
-        var centerX = $('#test').outerWidth() / 3
-        var centerY = $('#test').outerHeight() / 3
-
-        var deltaX = x - centerX
-        var deltaY = y - centerY
-
-        var percentX = deltaX / centerX
-        var percentY = deltaY / centerY
-        var deg = 5
-
-        $('#banner').css({
-            transform: 'rotateX(' + deg * -percentY + 'deg)' +
-                ' rotateY(' + deg * percentX + 'deg)'
-        })
-    })
-
-    $('#test').on('mouseleave', function () {
-        $('#banner').css({
-            transform: ''
-        })
-    })
-</script> -->
-
-
-<!-- <script src="./测试//sass/node_modules/eruda/eruda.js"></script> -->
-<script>
-    let AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioContext = new AudioContext();
-    let analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    analyser = audioContext.createAnalyser();
-
-    let audio = document.getElementById('audio');
-    let audioSrc = audioContext.createMediaElementSource(audio);
-    audioSrc.connect(analyser);
-    analyser.connect(audioContext.destination);
-    let canvas = document.getElementById('canvas');
-
-    let ctx = canvas.getContext("2d");
-    ctx.lineWidth = 2;
-    let grd = ctx.createLinearGradient(100, 0, 600, 0);
-    grd.addColorStop(0, "#00d0ff");
-    grd.addColorStop(1, "#eee");
-
-    let grd2 = ctx.createLinearGradient(0, 0, 600, 0);
-    grd2.addColorStop(0, "#fff");
-    grd2.addColorStop(1, "#e720ee");
-    let het = 0;
-
-    var globalID;
-
-    function render() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let dataArray = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(dataArray);
-        ctx.beginPath();
-        for (let i = 0; i < 200; i++) {
-            let value = dataArray[6 * i];
-            ctx.fillStyle = grd;
-            ctx.fillRect(i * 5, 300, 2, -value + 1);
-            ctx.fillRect(i * 5, 280 - value, 2, het);
-            ctx.fillStyle = grd2;
-            ctx.fillRect(i * 5, 300, 2, value + 1);
-            ctx.fillRect(i * 5, 320 + value, 2, het);
-        }
-        globalID = requestAnimationFrame(render);
-    };
-    globalID = requestAnimationFrame(render);
-
-
-    var fileChange = document.getElementById('fileChooser');
-    fileChange.onchange = fileChange = (e) => {
-        if (e.target.files[0]) {
-            let playfile = URL.createObjectURL(e.target.files[0]);
-            audio.src = playfile;
-            let musicName = e.target.files[0].name.split('.')[0];
-            audio.play();
-        }
-    };
-
-
-    document.querySelector('#bofnag').onclick=()=>{
-        audio.play();
+    #huahua {
+        border: 13px solid #ccc;
+        padding: 50px;
     }
 
+    .title {
+        font-size: 40px;
+        font-weight: bold;
+        color: pink;
+    }
+
+    .bodyddd{
+
+        width: 7000px;
+        height: 100000px;
+    }
+</style>
+
+<body>
+
+    <div class="bodyddd">
+
+        <button onclick="getPDF()">PDF</button>
+    <!--
+    <div id="huahua" style="width: 600px;">
+        <P class="title">一页pdf显示html页面生成的canvas高度一页pdf显示html页面生成的canvas高度一页pdf显示html页面生成的canvas高度一页pdf显示html页面生成的canvas高度</P>
+        <span style="color: blue;
+        font-size: 36px;">html页面生成的canvas高度一页pdf显示html页面生成的canvas高度一页pdf显示html页面生成的canvas高度一页pdf显示html页面生成的canvas高度</P></span>
+    </div> -->
+
+
+    <div id="pdf1" style="width: 1240px;">
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line "></div>
+            <div class="pdf-title">
+                威学托福全真测试 <br>模考反馈报告
+            </div>
+            <div class="pdf-info">
+                <ul class="p-info">
+                    <li><span>课程顾问</span> <input type="text" readonly="readonly" class=""></li>
+                    <li><span>学生姓名</span> <input type="text" readonly="readonly" class=""></li>
+                    <li><span>测试日期</span> <input type="text" readonly="readonly" class=""></li>
+                    <li><span>考试时间</span> <input type="text" readonly="readonly" class=""></li>
+                    <li><span>目前分数</span> <input type="text" readonly="readonly" class=""></li>
+                    <li><span>目标分数</span> <input type="text" readonly="readonly" class=""></li>
+                </ul>
+            </div>
+            <div class="pdf-res">
+                <div class="res-title"><span class=""></span>
+                    <p class="">测试结果</p> <span class=""></span>
+                </div>
+                <ul class="pdf-res-list">
+                    <li class="pdf-item-score">科目</li>
+                    <li class="pdf-item-score">分数</li>
+                    <li class="pdf-item-score">总题数</li>
+                    <li class="pdf-item-score">答对数</li>
+                    <li class="pdf-item-score">答错数</li>
+                    <li class="pdf-item-score">未答数</li>
+                </ul>
+                <ul class="pdf-res-list-cont">
+                    <li class="pdf-item-score">
+                        <p>阅读</p>
+                    </li>
+                    <li class="pdf-item-score">8</li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                </ul>
+                <ul class="pdf-res-list-cont">
+                    <li class="pdf-item-score">
+                        <p>听力</p>
+                    </li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                </ul>
+                <ul class="pdf-res-list-cont">
+                    <li class="pdf-item-score">
+                        <p>口语</p>
+                    </li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                </ul>
+                <ul class="pdf-res-list-cont">
+                    <li class="pdf-item-score">
+                        <p>写作</p>
+                    </li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                    <li class="pdf-item-score"></li>
+                </ul>
+                <div class="pdf-total">
+                    <p class="">总分</p>
+                    <p class="">8</p>
+                </div>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p>分数表现</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                <span style="font-family:宋体">CEFR Level</span> &nbsp; <span
+                                    style="font-family:宋体">B1</span>
+                            </p>
+
+
+                            <p>
+                                <span
+                                    style="font-family:宋体">阅读部分分数在中低水平的考生可以理解英语学术文章中的中心和重要信息，但是他们整体的理解是有限的。当句间关系清晰简单时，如一个观点后面跟了一个例子，此时他们可以理解两句或以上的句间关系。但是他们在理解文章更密集复杂的部分时有困难。</span>
+                            </p>
+                            <p>
+                                <strong><span style="font-family:宋体">Test takers who score at the Low-intermediate level
+                                        typically can </span></strong>
+                            </p>
+                            <p>
+                                <span style="font-family:宋体">阅读部分分数在中低水平的考生可以</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">Understand texts
+                                        with basic grammar, but have inconsistent understanding of texts with complex
+                                        grammatical structures.</span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">用基本语法理解文本，但是对复杂语法结构的文本理解不一致。</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">Understand
+                                        high-frequency academic vocabulary but often have difficulty with
+                                        lower-frequency words. </span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">理解高频学术词汇但是经常难以理解低频词汇。</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">Locate
+                                        information in a passage by matching words or relying on high-frequency
+                                        vocabulary, but their limited ability to recognize paraphrases results in
+                                        incomplete understanding of the connections among ideas and information. </span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">通过单词匹配或者依靠高频词汇在文章中定位信息，但是识别段落的有限能力会导致不能全面理解观点和信息之间的联系。</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">Identify an
+                                        authors purpose when that purpose is explicitly stated or easy to infer from the
+                                        context. </span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">当作者的目的被清晰表达或者容易从文本推断时，可以识别作者的目的。</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">Recognize major
+                                        ideas in a passage when the information is clearly presented, memorable, or
+                                        illustrated by examples but have difficulty doing so when the passage is more
+                                        demanding. </span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">当信息被清晰呈现</span><span style="font-family:宋体">,</span><span
+                                    style="font-family:宋体">是显著的或者被例子阐述时，可以识别文章的主要观点，但是当文章变难的时候难以做到识别主要观点中心。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <!---->
+                    <!---->
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <!---->
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(73, 185, 162);">能力解析</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">4-17 <span
+                                        style="font-family:宋体">分数段可以理解的是很直接表达出来的文章主要观点，对很多具体内容、未</span> <span
+                                        style="font-family:宋体">被强调的重点信息、及信息间逻辑关系和目的，均把握不太到位。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">而之所以会出现这些困难，是因为处于</span> 4-17 <span
+                                        style="font-family:宋体">分时阅读的基础能力相对较弱，同</span> <span
+                                        style="font-family:宋体">时对于逻辑关系、文章结构和出题选项设计也欠缺比较多的理解。</span>
+                                </span></p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <!---->
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <!---->
+                    <!---->
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(236, 106, 104);">提升方向</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                <span style="font-family:宋体">如果你目前处于</span> 4-17 <span
+                                    style="font-family:宋体">分数段，希望可以提高到</span> 18-23<span
+                                    style="font-family:宋体">，需要在以下几方面做提升</span>:
+                            </p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">从句子到段落到文章分阶段练习。最后一个阶段需接触及精练真题，新政后</span> <span
+                                        style="font-family:宋体">出现的真题也需要进行部分练习，以防出现大量失分的情况。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">首先重点提高阅读实力，包含单词和句子两个层面。</span> <span
+                                        style="font-family:宋体">单词需注意区分阅读和听力词汇，切忌希望一本书搞定托福词汇，并且需要懂单词的词性以及至少三个意思，句子需注意首先懂句内语法规则，之后按照对的步骤和</span>
+                                    <span style="font-family:宋体">方法练习阅读长难句。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">对阅读中心句以及全文逻辑思路，有一定的认知和把握，而不只是局限于基本</span> <span
+                                        style="font-family:宋体">的并列</span>(one another)<span
+                                        style="font-family:宋体">、转折</span>(but however)<span
+                                        style="font-family:宋体">等等。并且结合全文逻辑思路和套</span> <span
+                                        style="font-family:宋体">路去理解正文中内容。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">纠正纯翻译的阅读方式。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">对于阅读出题思路和选项设计，有一定理解，而不是局限于常见的细节</span>/<span
+                                        style="font-family:宋体">目的</span>/ <span style="font-family:宋体">推断</span>/<span
+                                        style="font-family:宋体">重听等题型和与原文相反</span>/<span
+                                        style="font-family:宋体">无中生有等选项，可以通过科学的做题方法提高</span> <span
+                                        style="font-family:宋体">答对率。</span>
+                                </span></p>
+                            <p>
+                                &nbsp;
+                            </p>
+                            <p>
+                                <span style="font-family:宋体">如果你目前处于</span> 4-17 <span
+                                    style="font-family:宋体">分数段，希望可以提高到</span> 24 <span
+                                    style="font-family:宋体">分以上，需要在以下几方面做</span> <span style="font-family:宋体">提升</span>:
+                            </p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">从句子到段落到文章分阶段练习。最后一个阶段需接触及精练真题，做好全</span> <span
+                                        style="font-family:宋体">面的文章精读分析和错题分析。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">首先重点提高阅读实力，包含单词和句子两个层面。</span> <span
+                                        style="font-family:宋体">单词不仅背诵熟悉高频词汇，同时也需要接触背诵低频词汇，并且需注意区分形</span> <span
+                                        style="font-family:宋体">近词，至少背诵单词的前</span> 3 <span
+                                        style="font-family:宋体">个意思，切忌只记一个意思，同时按照拆句的方法来</span> <span
+                                        style="font-family:宋体">锻炼长难句提高句子阅读能力。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">对阅读中心句以及全文逻辑思路，有足够好的认知和把握，而不只是局限于基</span> <span
+                                        style="font-family:宋体">本的并列</span>(one another)<span
+                                        style="font-family:宋体">、转折</span>(but however)<span
+                                        style="font-family:宋体">等等。并且结合全文逻辑思路和</span> <span
+                                        style="font-family:宋体">套路去理解正文中段落和句子内容。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">纠正纯做翻译的阅读方式。</span>
+                                </span></p>
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">对于阅读出题思路和选项设计，有比较好的理解，而不是局限于常见的细节</span>/ <span
+                                        style="font-family:宋体">目的</span>/<span
+                                        style="font-family:宋体">推断等题型和与原文相反</span>/<span
+                                        style="font-family:宋体">无中生有等选项，可以通过科学的做题方法明显</span> <span
+                                        style="font-family:宋体">提高答对率。</span>
+                                </span></p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p>分数表现</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph" style="margin-left:28px;text-align:left">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Test takers with a Listening section score
+                                    below 9 have not yet demonstrated proficiency at the <strong>Low-Intermediate
+                                        Intermediate</strong> level.</span>
+                            </p>
+                            <p style="text-align:left">
+                                <span style="font-size: 16px;font-family:宋体">低于</span><span
+                                    style="font-size:16px;font-family:宋体">9</span><span
+                                    style="font-size:16px;font-family:宋体">分的考生还没有达到熟练的中低级水平</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(73, 185, 162);">能力解析</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">0-8</span><span
+                                    style="font-size:16px;font-family:宋体">分的学生听力基础非常薄弱，很多单词听不出、出现语音现象的也很难识别出来，语速快或长度偏长的就更是困难。更高层次的重点、考点、逻辑、出题及选项设计，在目前阶段来说基本没能力顾及。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(236, 106, 104);">提升方向</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph" style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">目前最重要的就是基础能力提升，这是最关键的一个阶段。背对单词、背好单词，并进行语音</span><span
+                                    style="font-size:16px;font-family:宋体">/</span><span
+                                    style="font-size:16px;font-family:宋体">语法不同类型句子的有效精练。之后进入基础阶段，进一步提高基础、强化文章框架导图关和中心答题法，以及段落内部结构。再之后就是不同学科真题讲解的强化阶段了。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p>分数表现</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                Test takers who receive a Speaking section score at the BASIC level are typically able
+                                to communicate limited information about familiar, everyday topics.
+                            </p>
+                            <p>
+                                <span style="font-family:宋体">口语部分得分在基础水平的考生通常能够就熟练的日常话题交流有限的信息。</span>
+                            </p>
+                            <p>
+                                Test takers who score at the Basic level typically can
+                            </p>
+                            <p>
+                                <span style="font-family:宋体">详细为：</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Speak slowly and carefully so that they make
+                                    themselves understood<span style="font-family:宋体">，</span> but pronunciation maybe
+                                    strongly influenced by the speaker's first language and at times be
+                                    unintelligible<span style="font-family:宋体">；</span>Speech maybe marked by frequent
+                                    pauses<span style="font-family:宋体">，</span> reformulations<span
+                                        style="font-family:宋体">，</span> and false starts.
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">缓慢且小心的表达，以便他们能够理解自身的意思，但是讲话者发音可能会受到母语的较大的影响，有时会让人费解，并且有时会反应迟疑。话语通常伴有重复性停顿，反复重述，和起句失误。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Produce mostly short utterances<span
+                                        style="font-family:宋体">，</span> connecting phrases with simple linking
+                                    words(such as<span style="font-family:宋体">“</span>and") to make themselves
+                                    understood<span style="font-family:宋体">；</span> grammar and vocabulary are
+                                    limited<span style="font-family:宋体">，</span> and frequent pauses may occur while
+                                    searching for words.
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">能使用一些简短表达，连接词组与连接词</span> <span
+                                    style="font-family:宋体">，</span>(<span style="font-family: 宋体">比如</span> <span
+                                    style="font-family:宋体">“</span>and <span style="font-family:宋体">和”</span>)<span
+                                    style="font-family:宋体">一起使用表达，让他人明白。但缺乏语法和单词，且常会在寻思单词中出现频繁停顿。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Convey some limited information about familiar
+                                    topics<span style="font-family:宋体">；</span> supporting points and/or details are
+                                    generally missing<span style="font-family:宋体">，</span> and main ideas maybe
+                                    absent<span style="font-family:宋体">，</span> unclear<span
+                                        style="font-family:宋体">，</span> or not well connected
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-size:16px;font-family:宋体">传达一些关于熟悉话题的有限信息；支持点和细节信息往往会缺失，主要观点可能缺失，不明确或不紧密联系。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(73, 185, 162);">能力解析</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">10-15<span
+                                        style="font-family:宋体">分数段的学生独立话题没有答题思路，因此</span>45s<span
+                                        style="font-family:宋体">的答案没有很多内容；综合听力影响很大，听不懂听力因此复述也很难；发音和语法错误会比较多，影响对答案的理解。</span>
+                                </span></p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <!---->
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <!---->
+                    <!---->
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(236, 106, 104);">提升方向</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                <span style="font-family:宋体">如果你现在处于</span>10-15<span
+                                    style="font-family:宋体">分数段，希望能提到</span>20<span
+                                    style="font-family: 宋体">分，需要再一下几方面做提升：</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span
+                                        style="font-family:宋体">减少听力场景词汇的影响。</span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">综合任务出现的场景词汇对同学们影响很大，遇到像</span>commuting students<span
+                                    style="font-family:宋体">这些词汇同学们会听不懂导致影响理解。所以要去背诵场景词汇，减少听力的阻碍</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">背熟答题框架和模版</span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">开头过渡总结句最不应该卡壳，因此同学们要把框架模版背的滚瓜烂熟，不要卡壳。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">背熟独立语料库</span>
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">托福口语独立题</span>80%<span
+                                    style="font-family:宋体">都是语料题，就是背了语料就能套用的题目，因此想要冲</span>20<span
+                                    style="font-family: 宋体">分的同学独立语料一定要多去背诵，形成肌肉记忆。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">提高语言表达能力</span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-size:16px;font-family:宋体">想要拿高分的同学，在语言方面一定要自信，不能卡壳和自改。因此同学们精炼题目的过程中，要多去积累表达和练习语言转换，提高自己的语感。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p>分数表现</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                Independent Writing and Independent Writing<span style="font-family:宋体">：</span>
+                            </p>
+                            <p>
+                                <span style="font-family:宋体">综合写作和独立写作：</span>
+                            </p>
+                            <p>
+                                <a>An essay at this level is marked by one or more of the following: </a>
+                            </p>
+                            <p>
+                                <span style="font-family: 宋体">这个级别的学生存在以下问题</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Limited development in response to the topic
+                                    and task;
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">切题能力局限</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Inadequate organization or connection of
+                                    ideas;
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">对观点的组织或联系不充分</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">Inappropriate or insufficient
+                                    exemplifications, explanations, or details;
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-size:14px;font-family:宋体;color:#2E3033;background:white">例证</span><span
+                                    style="font-size:14px;font-family:'Arial','sans-serif';color:#2E3033;background:white">,</span><span
+                                    style="font-size:14px;font-family: 宋体;color:#2E3033;background:white">解释</span><span
+                                    style="font-size:14px;font-family:'Arial','sans-serif';color:#2E3033;background:white">,</span><span
+                                    style="font-size:14px;font-family: 宋体;color:#2E3033;background:white">或细节</span><span
+                                    style="font-size:14px;font-family:宋体;color:#2E3033;background:white">呈现</span><span
+                                    style="font-size:14px;font-family:宋体;color:#2E3033;background:white">不适当或不充分</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">to support or illustrate generalizations in
+                                    response to the task;
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">段落文章组织基本合理，但只存在于表面层次上</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">A noticeably inappropriate choice of words or
+                                    word forms;
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">用逻辑连词，显得幼稚，生硬</span>
+                            </p>
+                            <p style="margin-left:28px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">An accumulation of errors in sentence
+                                    structure and/or usage.
+                                </span></p>
+                            <p>
+                                <span style="font-family:宋体">词汇方面拼写错误多，常有用词不得体现象。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(73, 185, 162);">能力解析</p>
+                        </div>
+                        <div class="item-cont">
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体">10-15<span
+                                        style="font-family:宋体">分数段的学生独立写作文章切题，段落组织基本合理，有逻辑性，但只存在于语义层次上，语言表达上未能体现</span>;<span
+                                        style="font-family: 宋体">句子框架结构基本成立，但有许多语法错误，句间联系不顺畅，往往是不善于使用逻辑连词，显得幼稚，生硬。词汇方面拼写错误多，常有用词不得体现象。综合写作部分能力比较差，不能很好的提取阅读和听力的内容。</span>
+                                </span></p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                    <!---->
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+        <div class="pdf">
+            <div class="pdf-logo"></div>
+            <div class="blue-line"></div>
+            <div class="pdf-test-details"></div>
+            <ul class="pdf-test-sub">
+                <li><span>测试科目</span> <input type="text" readonly="readonly" class=""></li>
+                <li><span>得分</span> <input type="text" readonly="readonly" class=""></li>
+            </ul>
+            <div class="pdf-test-content">
+                <ul class="pdf-tc-list">
+                    <!---->
+                    <!---->
+                    <li class="pdf-tc-list-item">
+                        <div class="item-tip">
+                            <p style="background-color: rgb(236, 106, 104);">提升方向</p>
+                        </div>
+                        <div class="item-cont">
+                            <p>
+                                <span style="font-family:宋体">如果你现在处于</span>10-15<span
+                                    style="font-family:宋体">分数段，希望能提到</span>20<span
+                                    style="font-family: 宋体">分，需要再一下几方面做提升：</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">多听多练</span>+<span
+                                        style="font-family:宋体">背综合写作常考词汇。</span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">综合任务出现的话题词汇有时候都是重复的，所以要去背诵综合写作高频词汇，减少听力的阻碍。多刷题，每个题目不要做过就算，要反复听写，学会提取每个句子的主谓宾从而掌握某个句子的主要内容信息。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">背熟答题框架和模版</span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">综合写作和独立写作都是可以有模板支撑着的，所以可以每天加深对模板的熟悉度，保证考试有话可写，然后再把节省出来的时间放在作文的展开论证上。</span>
+                            </p>
+                            <p class="MsoListParagraph">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">背熟独立语料库</span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">托福写作独立题很多都是重复或者雷同的进行考试的，所以建议背诵万能的写作段子或者论证例子从而就能套用题目，因此同学们独立写作段子语料一定要多去背诵以便快速作答。</span>
+                            </p>
+                            <p style="margin-left:48px">
+                                <span style="font-size:16px;font-family:Wingdings">l </span><span
+                                    style="font-size:16px;font-family:宋体"><span style="font-family:宋体">熟悉题目以及答题思路</span>
+                                </span></p>
+                            <p>
+                                <span
+                                    style="font-family:宋体">熟悉大量考试真题，并对题目进行分析并提前编写思路，保证考试遇到相关雷同的题目可以立马迅速反应过来并加快打字速度将其放在作文中。</span>
+                            </p>
+                            <p>
+                                <br>
+                            </p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="bottom-text">广州岗顶总部 · 广州万菱汇旗舰校区 · 广州金峰城校区 · 深圳南山校区 · 深圳福田校区</div>
+        </div>
+    </div>
+    </div>
+
+</body>
+<script src="./html2canvas.js"></script>
+<script src="./jspdf.js"></script>
+<script src="./pdf-text.js"></script>
+
+<script>
+    function getPDF() {
+
+        html2canvas(
+            document.querySelector('#pdf1'), {
+                dpi: 175, //导出pdf清晰度
+                useCORS: true,
+                onrendered: (canvas) => {
+                    var contentWidth = canvas.width;
+                    var contentHeight = canvas.height;
+                    console.log('contentWidth', contentWidth)
+                    console.log('contentHeight', contentHeight)
+
+
+                    //一页pdf显示html页面生成的canvas高度;
+                    var pageHeight = contentWidth / 592.28 * 841.89;
+                    //未生成pdf的html页面高度
+                    var leftHeight = contentHeight;
+                    //pdf页面偏移
+                    var position = 0;
+                    //html页面生成的canvas在pdf中图片的宽高（a4纸的尺寸[595.28,841.89]）
+                    var imgWidth = 595.28;
+                    var imgHeight = 592.28 / contentWidth * contentHeight;
+
+                    var pageData = canvas.toDataURL('image/jpeg', 1.0);
+                    var pdf = new jsPDF('p', 'pt', 'a4');
+                    //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+                    //当内容未超过pdf一页显示的范围，无需分页
+                    if (leftHeight < pageHeight) {
+                        pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                    } else {
+                        while (leftHeight > 0) {
+                            pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight + 35)
+                            leftHeight -= pageHeight;
+                            position -= 841.89;
+                            //避免添加空白页
+                            if (leftHeight > 0) {
+                                pdf.addPage();
+                            }
+                        }
+                    }
+
+                    pdf.save('content.pdf');
+                },
+                //背景设为白色（默认为黑色）
+                background: "#fff",
+
+            })
+    }
 </script>
-
-
 
 </html>
