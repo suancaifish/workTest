@@ -2,33 +2,37 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <style>
-  .oDiv1 {
-    width: 200px;
-    height: 200px;
-    background-color: pink;
-    animation: loading 1s 0s infinite linear;
-  }
-
-  @keyframes loading {
-    0% {
-      transform: rotate(0deg);
+    .oDiv1 {
+        width: 450px;
+        height: 315px;
+        background-color: pink;
+        margin-top: 400px;
+        /* animation: loading 1s 0s infinite linear; */
     }
 
-    100% {
-      transform: rotate(666turn);
+    @keyframes loading {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(666turn);
+        }
     }
-  }
 </style>
 
 <body>
 
-  <div class="oDiv1"></div>
+    <div class="oDiv1">
+
+    </div>
+    <input type="range" name="" id="">
 </body>
 <script src="./aliyun-upload-sdk/aliyun-oss-sdk-6.13.0.min.js"></script>
 <script src="./aliyun-upload-sdk/aliyun-upload-sdk-1.5.2.min.js"></script>
@@ -37,52 +41,52 @@
 
 
 <script>
-  const o = {
-    a: 'ccc',
-    b: 'ddd'
-  }
-  let obj = Object.create(o)
-  console.log(obj.constructor);
-  console.log(obj.a);
-  console.log(obj.__proto__ == o);
+    const o = {
+        a: 'ccc',
+        b: 'ddd'
+    }
+    let obj = Object.create(o)
+    console.log(obj.constructor);
+    console.log(obj.a);
+    console.log(obj.__proto__ == o);
 
 
 
-  let arr = [1, 2, 3, 4, 5, 6]
-  arr.map(item => {
-    item = item * 2
-  })
-  console.log(arr);
+    let arr = [1, 2, 3, 4, 5, 6]
+    arr.map(item => {
+        item = item * 2
+    })
+    console.log(arr);
 </script>
 
 <script type="text/javascript">
-  function SuperType(name) {
-    this.name = name;
-    this.colors = ["red", "blue", "green"];
-  }
-  SuperType.prototype.sayName = function () {
-    console.log(this.name);
-  }
+    function SuperType(name) {
+        this.name = name;
+        this.colors = ["red", "blue", "green"];
+    }
+    SuperType.prototype.sayName = function () {
+        console.log(this.name);
+    }
 
-  function SubType(name, age) {
-    SuperType.call(this, name); //继承属性
-    this.age = age;
-  }
-  //继承方法
-  SubType.prototype = new SuperType();
-  Subtype.prototype.constructor = SubType();
-  Subtype.prototype.sayAge = function () {
-    console.log(this.age);
-  }
-  var instance1 = new SubType("EvanChen", 18);
-  instance1.colors.push("black");
-  consol.log(instance1.colors); //"red","blue","green","black"
-  instance1.sayName(); //"EvanChen"
-  instance1.sayAge(); //18
-  var instance2 = new SubType("EvanChen666", 20);
-  console.log(instance2.colors); //"red","blue","green"
-  instance2.sayName(); //"EvanChen666"
-  instance2.sayAge(); //20
+    function SubType(name, age) {
+        SuperType.call(this, name); //继承属性
+        this.age = age;
+    }
+    //继承方法
+    SubType.prototype = new SuperType();
+    Subtype.prototype.constructor = SubType();
+    Subtype.prototype.sayAge = function () {
+        console.log(this.age);
+    }
+    var instance1 = new SubType("EvanChen", 18);
+    instance1.colors.push("black");
+    consol.log(instance1.colors); //"red","blue","green","black"
+    instance1.sayName(); //"EvanChen"
+    instance1.sayAge(); //18
+    var instance2 = new SubType("EvanChen666", 20);
+    console.log(instance2.colors); //"red","blue","green"
+    instance2.sayName(); //"EvanChen666"
+    instance2.sayAge(); //20
 </script>
 
 

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+</head>
+
+<body></body>
+<script>
+    // 协程 promise 版本
+    var timeout = (time) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log("time", time);
+                resolve(time + 2000);
+            }, time);
+        });
+    };
+
+    // Generator 遍历起器生成函数
+    function* callbackGenerator() {
+        var res = yield timeout(2000); // 使得 yield 的value是promise 自执行时把下一次的next在then里面执行
+        var res1 = yield timeout(res);
+    }
+
+    // promise版本 版本自执行函数
+    function run(Generator) {
+        var hw = Generator();
+        const next = (query) => {
+            console.log("next ~ query", query);
+            var aa = hw.next(query);
+            if (!aa.done) {
+                aa.value.then(next);
+            } else {
+                return false;
+            }
+        };
+        next();
+    }
+
+    // run(callbackGenerator)
+</script>
+
+<script>
+    // 01-定义一个订阅-发布模式函数；
+    function Pub2Sub() {
+        // 02-订阅器；
+        this._observer = {}
+    }
+    // 03-原型对象上面添加方法；
+    Pub2Sub.prototype = {
+        constructor: Pub2Sub,
+        // 04-订阅者；
+        subscribe: function (type, callback) {
+            if (Object.prototype.toString.call(callback) !== '[object Function]') return
+            // 订阅器中是否存在订阅行为；
+            if (!this._observer[type]) this._observer[type] = []
+            this._observer[type].push(callback)
+            return this
+        },
+        // 05-发布者；
+        publish: function () {
+            let _self = this
+            // 获取发布行为
+            let type = Array.prototype.shift.call(arguments)
+            // 获取发布主题
+            let theme = Array.prototype.slice.call(arguments)
+            // 获取相关主题所有订阅者
+            let subscribes = _self._observer[type]
+            console.log("subscribes", subscribes)
+            // 发布主题
+            if (!subscribes || !subscribes.length) {
+                console.warn('unsubscribe action or no actions in observer, please check out')
+                return
+            }
+            subscribes.forEach(callback => {
+                callback.apply(_self, theme)
+            })
+            return _self
+        },
+        // 06-取消订阅
+        unsubscrible: function (type, callback) {
+            if (!this._observer[type] || !this._observer[type].length) return
+            let subscribes = this._observer[type]
+            subscribes.some((item, index, arr) => {
+                if (item === callback) {
+                    // 删除对应的订阅行为
+                    arr.splice(index, 1)
+                    return true
+                }
+            })
+            return this
+        }
+    }
+    // 实例化发布-订阅模式
+    let ps = new Pub2Sub()
+
+    // 添加订阅
+    let sub1 = function (data) {
+        console.log('sub1' + data)
+    }
+    let sub2 = function (data) {
+        console.log('sub2' + data)
+    }
+    ps.subscribe('click', sub1)
+    ps.subscribe('click', sub2)
+
+    // 实现发布、取订及再发布
+    ps.publish('click', '第一次点击消息').unsubscrible('click', sub2).publish('click', '第二次点击消息')
+    // 打印结果依次是：
+    // sub1第一次点击消息
+    // sub2第一次点击消息
+    // sub1第二次点击消息
+
+
+
+    // let obj = {}
+    // console.log(obj)
+    // let arr2 = [];
+    // console.log(arr2)
+
+
+
+
+    // var event = new CustomEvent('myEvent', {
+    //     detail: {
+    //         a: 'jnkdsjlnkfdsklj'
+    //     }
+    // });
+    // document.addEventListener("myEvent", function (e) {
+    //     console.log('e', e);
+    // })
+    // document.dispatchEvent(event);
+
+
+
+    console.log('script start');
+
+    setTimeout(function () {
+        console.log('setTimeout');
+    }, 0);
+
+    Promise.resolve().then(function () {
+        console.log('promise1');
+    }).then(function () {
+        console.log('promise2');
+    });
+    console.log('script end');
+</script>
+
+<script>
+    navigator.getUserMedia({
+        video: true,
+        audio: true
+    }, function onSuccess(stream) {
+        console.log('已点击允许,开启成功');
+
+    }, function onError(error) {
+        console.log("错误：", error);
+
+    });
+
+
+    function add(a, b) {
+        return a + b
+    }
+    const res = add(5, 6)
+    res
+</script>
+
+</html>
